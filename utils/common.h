@@ -87,16 +87,16 @@ struct fmt::formatter<sbs::Vec4Int> : fmt::formatter<std::string> {
 };
 
 template <>
-struct fmt::formatter<sbsar::BitDepth> : fmt::formatter<std::string> {
+struct fmt::formatter<sbsar::Precision> : fmt::formatter<std::string> {
 	template <typename FormatContext>
-	auto format(sbsar::BitDepth v, FormatContext& ctx)
+	auto format(sbsar::Precision v, FormatContext& ctx)
 	{
 		switch (v) {
-			case sbsar::BitDepth::BPP8:
+			case sbsar::Precision::B8:
 				return fmt::format_to(ctx.out(), "8 Bits");
-			case sbsar::BitDepth::BPP16:
+			case sbsar::Precision::B16:
 				return fmt::format_to(ctx.out(), "16 Bits");
-			case sbsar::BitDepth::BPP32:
+			case sbsar::Precision::B32:
 				return fmt::format_to(ctx.out(), "32 Bits");
 		}
 	}

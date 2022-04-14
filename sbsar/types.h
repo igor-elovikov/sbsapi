@@ -29,10 +29,10 @@ enum class ParameterWidget {
 
 // TODO: no channels order yet
 
-enum class BitDepth {
-	BPP8,
-	BPP16,
-	BPP32
+enum class Precision {
+	B8,
+	B16,
+	B32
 };
 
 enum class DataFormat {
@@ -48,7 +48,7 @@ enum class DataType {
 };
 
 struct ImageFormat {
-	BitDepth depth;
+	Precision precision;
 	DataFormat format;
 	DataType dtype;
 	int num_channels;
@@ -56,28 +56,28 @@ struct ImageFormat {
 	ImageFormat() = default;
 	explicit ImageFormat(SubstancePixelFormat pixel_format)
 	{
-		int precision = pixel_format & Substance_PF_MASK_RAWPrecision;
+		int sbs_precision = pixel_format & Substance_PF_MASK_RAWPrecision;
 		int channels = pixel_format & Substance_PF_MASK_RAWChannels;
 
-		switch (precision) {
+		switch (sbs_precision) {
 			case Substance_PF_8I:
 				dtype = DataType::INTEGER;
-				depth = BitDepth::BPP8;
+				precision = Precision::B8;
 				break;
 
 			case Substance_PF_16I:
 				dtype = DataType::INTEGER;
-				depth = BitDepth::BPP16;
+				precision = Precision::B16;
 				break;
 
 			case Substance_PF_16F:
 				dtype = DataType::FLOAT;
-				depth = BitDepth::BPP16;
+				precision = Precision::B16;
 				break;
 
 			case Substance_PF_32F:
 				dtype = DataType::FLOAT;
-				depth = BitDepth::BPP32;
+				precision = Precision::B32;
 				break;
 
 			default:
@@ -116,24 +116,24 @@ struct ImageFormat {
 		auto result = 0u;
 		switch (dtype) {
 			case DataType::INTEGER:
-				switch (depth) {
-					case BitDepth::BPP8:
+				switch (precision) {
+					case Precision::B8:
 						result |= Substance_PF_8I;
 						break;
-					case BitDepth::BPP16:
+					case Precision::B16:
 						result |= Substance_PF_16I;
 						break;
-					case BitDepth::BPP32:
+					case Precision::B32:
 						break;
 				}
 			case DataType::FLOAT:
-				switch (depth) {
-					case BitDepth::BPP8:
+				switch (precision) {
+					case Precision::B8:
 						break;
-					case BitDepth::BPP16:
+					case Precision::B16:
 						result |= Substance_PF_16F;
 						break;
-					case BitDepth::BPP32:
+					case Precision::B32:
 						result |= Substance_PF_32F;
 						break;
 				}

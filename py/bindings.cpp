@@ -32,10 +32,10 @@ PYBIND11_MODULE(pysbsar, m)
 	  .value("IMAGE", sbsar::ParameterWidget::IMAGE)
 	  .value("POSITION", sbsar::ParameterWidget::POSITION);
 
-	py::enum_<sbsar::BitDepth>(m, "BitDepth")
-	  .value("BPP8", sbsar::BitDepth::BPP8)
-	  .value("BPP16", sbsar::BitDepth::BPP16)
-	  .value("BPP32", sbsar::BitDepth::BPP32);
+	py::enum_<sbsar::Precision>(m, "Precision")
+	  .value("B8", sbsar::Precision::B8)
+	  .value("B16", sbsar::Precision::B16)
+	  .value("B32", sbsar::Precision::B32);
 
 	py::enum_<sbsar::DataFormat>(m, "DataFormat")
 	  .value("RGB", sbsar::DataFormat::RGB)
@@ -48,7 +48,7 @@ PYBIND11_MODULE(pysbsar, m)
 	  .value("FLOAT", sbsar::DataType::FLOAT);
 
 	py::class_<sbsar::ImageFormat>(m, "ImageFormat")
-	  .def_readwrite("depth", &sbsar::ImageFormat::depth)
+	  .def_readwrite("depth", &sbsar::ImageFormat::precision)
 	  .def_readwrite("format", &sbsar::ImageFormat::format)
 	  .def_readwrite("dtype", &sbsar::ImageFormat::dtype)
 	  .def_readwrite("num_channels", &sbsar::ImageFormat::num_channels);
@@ -143,29 +143,30 @@ PYBIND11_MODULE(pysbsar, m)
 
 		  switch (format.dtype) {
 			  case sbsar::DataType::INTEGER:
-				  switch (format.depth) {
-					  case sbsar::BitDepth::BPP8:
+				  switch (format.precision) {
+					  case sbsar::Precision::B8:
 						  info.format = py::format_descriptor<unsigned char>::format();
 						  info.itemsize = sizeof(unsigned char);
 						  break;
-					  case sbsar::BitDepth::BPP16:
+					  case sbsar::Precision::B16:
 						  info.format = py::format_descriptor<uint16_t>::format();
 						  info.itemsize = sizeof(uint16_t);
-					  case sbsar::BitDepth::BPP32:
+						  break;
+					  case sbsar::Precision::B32:
 						  spdlog::warn("Python Buffer Object: Unsupported format Int32 for output!");
 						  break;
 				  }
 				  break;
 			  case sbsar::DataType::FLOAT:
-				  switch (format.depth) {
-					  case sbsar::BitDepth::BPP8:
+				  switch (format.precision) {
+					  case sbsar::Precision::B8:
 						  spdlog::warn("Python Buffer Object: Float8 is not a valid format!");
 						  break;
-					  case sbsar::BitDepth::BPP16:
-						  info.format = "e"; //py::format_descriptor<float>::format(); // "e"?
+					  case sbsar::Precision::B16:
+						  info.format = "e";  // TODO: "e"? is it portable?
 						  info.itemsize = sizeof(uint16_t);
 						  break;
-					  case sbsar::BitDepth::BPP32:
+					  case sbsar::Precision::B32:
 						  info.format = py::format_descriptor<float>::format();
 						  info.itemsize = sizeof(float );
 						  break;

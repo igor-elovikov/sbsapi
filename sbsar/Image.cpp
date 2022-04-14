@@ -7,12 +7,12 @@ namespace sbsar {
 
 auto get_oiio_type(const Image& image) -> oiio::TypeDesc
 {
-	switch (image.format.depth) {
+	switch (image.format.precision) {
 
-		case BitDepth::BPP8:
+		case Precision::B8:
 			return oiio::TypeUInt8;
 
-		case BitDepth::BPP16:
+		case Precision::B16:
 			switch (image.format.dtype) {
 				case DataType::INTEGER:
 					return oiio::TypeUInt16;
@@ -22,7 +22,7 @@ auto get_oiio_type(const Image& image) -> oiio::TypeDesc
 					return oiio::TypeDesc::NONE;
 			}
 
-		case BitDepth::BPP32:
+		case Precision::B32:
 			switch (image.format.dtype) {
 				case DataType::INTEGER:
 					return oiio::TypeUInt32;
@@ -43,22 +43,22 @@ auto get_format_from_oiio(const oiio::TypeDesc& type_desc) -> ImageFormat
 	switch (type_desc.basetype) {
 		case oiio::TypeDesc::UCHAR:
 			format.dtype = DataType::INTEGER;
-			format.depth = BitDepth::BPP8;
+			format.precision = Precision::B8;
 			break;
 
 		case oiio::TypeDesc::HALF:
 			format.dtype = DataType::FLOAT;
-			format.depth = BitDepth::BPP16;
+			format.precision = Precision::B16;
 			break;
 
 		case oiio::TypeDesc::UINT16:
 			format.dtype = DataType::INTEGER;
-			format.depth = BitDepth::BPP16;
+			format.precision = Precision::B16;
 			break;
 
 		case oiio::TypeDesc::FLOAT:
 			format.dtype = DataType::FLOAT;
-			format.depth = BitDepth::BPP32;
+			format.precision = Precision::B32;
 			break;
 
 		default:
