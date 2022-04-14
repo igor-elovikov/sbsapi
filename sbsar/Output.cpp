@@ -1,8 +1,5 @@
 #include "Output.h"
 
-#include <OpenImageIO/imageio.h>
-namespace oiio = OIIO;
-
 namespace sbsar {
 
 auto Output::grab_result() -> void

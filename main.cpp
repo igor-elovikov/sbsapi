@@ -22,7 +22,7 @@ int main()
 	graph.render();
 	out.save("D:/test.png");
 
-	pkg.graphs["blur"].input("input").load("D:/test.png");
+	pkg.graphs["blur"].input("input").load_from_file("D:/test.png");
 	pkg.graphs["blur"].render();
 	pkg.graphs["blur"].output("output").save("D:/blurred.png");
 

@@ -163,7 +163,7 @@ PYBIND11_MODULE(pysbsar, m)
 						  spdlog::warn("Python Buffer Object: Float8 is not a valid format!");
 						  break;
 					  case sbsar::Precision::B16:
-						  info.format = "e";  // TODO: "e"? is it portable?
+						  info.format = "e";  // NOTE: "e"? is it portable?
 						  info.itemsize = sizeof(uint16_t);
 						  break;
 					  case sbsar::Precision::B32:
@@ -179,10 +179,57 @@ PYBIND11_MODULE(pysbsar, m)
 		  return info;
 	  });
 
+	py::class_<sbsar::Input>(m, "Input", py::buffer_protocol())
+	  .def("load_from_file", &sbsar::Input::load_from_file, "filename"_a)
+	  .def("load_from_array", [](sbsar::Input& input, py::buffer& buffer) -> void {
+		  auto info = buffer.request();
+		  auto shape = info.shape;
+		  if (shape.size() < 2) return;
+
+		  auto format = sbsar::ImageFormat{};
+		  format.num_channels = shape.size() > 2 ? static_cast<int>(shape[2]) : 1;
+
+		  if (info.format == py::format_descriptor<unsigned char>::format()) {
+			  format.dtype = sbsar::DataType::INTEGER;
+			  format.precision = sbsar::Precision::B8;
+		  }
+		  else if (info.format == py::format_descriptor<unsigned short>::format()) {
+			  format.dtype = sbsar::DataType::INTEGER;
+			  format.precision = sbsar::Precision::B16;
+		  }
+		  else if (info.format == "e") {
+			  format.dtype = sbsar::DataType::FLOAT;
+			  format.precision = sbsar::Precision::B16;
+		  }
+		  else if (info.format == py::format_descriptor<float>::format()) {
+			  format.dtype = sbsar::DataType::FLOAT;
+			  format.precision = sbsar::Precision::B32;
+		  }
+		  else {
+			  spdlog::warn("Python Buffer Object: Uploading failed, format is not supported");
+			  return;
+		  }
+
+		  switch (format.num_channels) {
+			  case 1:
+				  format.format = sbsar::DataFormat::GRAYSCALE;
+				  break;
+			  case 3:
+				  format.format = sbsar::DataFormat::RGB;
+				  break;
+			  case 4:
+				  format.format = sbsar::DataFormat::RGBA;
+				  break;
+		  }
+
+		  input.load_from_buffer(info.ptr, static_cast<int>(shape[0]), static_cast<int>(shape[1]), format);
+	  });
+
 	py::class_<sbsar::Graph>(m, "Graph")
 	  .def("render", &sbsar::Graph::render, "grab_results"_a = true)
 	  .def("parm", &sbsar::Graph::parm, py::return_value_policy::reference)
 	  .def("output", &sbsar::Graph::output, py::return_value_policy::reference)
+	  .def("input", &sbsar::Graph::input, py::return_value_policy::reference)
 	  .def("parms", &sbsar::Graph::parms)
 	  .def("outputs", &sbsar::Graph::outputs)
 	  .def("inputs", &sbsar::Graph::inputs);
