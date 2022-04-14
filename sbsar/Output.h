@@ -33,5 +33,23 @@ public:
 
 	auto grab_result() -> void;
 	auto save(const std::string& filename) -> void;
+
+	[[nodiscard]] auto get_raw_data() const -> void*
+	{
+		if (!render_result) return nullptr;
+		return render_result->get_raw_data();
+	}
+
+	[[nodiscard]] const auto& get_data_format() const
+	{
+		if (!render_result) return format;
+		return render_result->format;
+	}
+
+	[[nodiscard]] auto get_data_size() const
+	{
+		if (!render_result) return std::make_pair(0, 0);
+		return std::make_pair(render_result->width, render_result->height);
+	}
 };
 }

@@ -123,9 +123,60 @@ PYBIND11_MODULE(pysbsar, m)
 		parm_class.def("set", &sbsar::Parameter::set<builtin_t>, "value"_a);
 	});
 
-	py::class_<sbsar::Output>(m, "Output")
+	py::class_<sbsar::Output>(m, "Output", py::buffer_protocol())
 	  .def("save", &sbsar::Output::save, "filename"_a)
-	  .def_readonly("format", &sbsar::Output::format);
+	  .def_readonly("format", &sbsar::Output::format)
+	  .def_buffer([](sbsar::Output& output) -> py::buffer_info {
+
+		  auto info = py::buffer_info{};
+		  auto& format = output.get_data_format();
+
+		  info.ptr = output.get_raw_data();
+		  info.ndim = 2;
+		  auto [width, height] = output.get_data_size();
+		  if (format.num_channels == 1) {
+			  info.shape = {width, height};
+		  }
+		  else {
+			  info.shape = {width, height, format.num_channels};
+		  }
+
+		  switch (format.dtype) {
+			  case sbsar::DataType::INTEGER:
+				  switch (format.depth) {
+					  case sbsar::BitDepth::BPP8:
+						  info.format = py::format_descriptor<unsigned char>::format();
+						  info.itemsize = sizeof(unsigned char);
+						  break;
+					  case sbsar::BitDepth::BPP16:
+						  info.format = py::format_descriptor<uint16_t>::format();
+						  info.itemsize = sizeof(uint16_t);
+					  case sbsar::BitDepth::BPP32:
+						  spdlog::warn("Python Buffer Object: Unsupported format Int32 for output!");
+						  break;
+				  }
+				  break;
+			  case sbsar::DataType::FLOAT:
+				  switch (format.depth) {
+					  case sbsar::BitDepth::BPP8:
+						  spdlog::warn("Python Buffer Object: Float8 is not a valid format!");
+						  break;
+					  case sbsar::BitDepth::BPP16:
+						  info.format = py::format_descriptor<float>::format();
+						  info.itemsize = sizeof(uint16_t);
+						  break;
+					  case sbsar::BitDepth::BPP32:
+						  info.format = py::format_descriptor<float>::format();
+						  info.itemsize = sizeof(float );
+						  break;
+				  }
+				  break;
+		  }
+
+		  info.strides = { info.itemsize * height * format.num_channels, info.itemsize * format.num_channels };
+
+		  return info;
+	  });
 
 	py::class_<sbsar::Graph>(m, "Graph")
 	  .def("render", &sbsar::Graph::render, "grab_results"_a = true)
