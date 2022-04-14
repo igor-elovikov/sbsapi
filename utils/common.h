@@ -14,11 +14,13 @@
 #include <spdlog/spdlog.h>
 #include <range/v3/all.hpp>
 
+#include "sbsar/types.h"
+
 namespace rn = ranges;
 namespace vi = rn::views;
 namespace sbs = SubstanceAir;
 
-template<class Container>
+template <class Container>
 auto load_file(Container& container, const std::string& path, bool binary)
 {
 	std::ifstream is(
@@ -81,5 +83,21 @@ struct fmt::formatter<sbs::Vec4Int> : fmt::formatter<std::string> {
 	auto format(sbs::Vec4Int v, FormatContext& ctx)
 	{
 		return fmt::format_to(ctx.out(), "Vec4Int [{}, {}, {}, {}]", v.x, v.y, v.z, v.w);
+	}
+};
+
+template <>
+struct fmt::formatter<sbsar::BitDepth> : fmt::formatter<std::string> {
+	template <typename FormatContext>
+	auto format(sbsar::BitDepth v, FormatContext& ctx)
+	{
+		switch (v) {
+			case sbsar::BitDepth::BPP8:
+				return fmt::format_to(ctx.out(), "8 Bits");
+			case sbsar::BitDepth::BPP16:
+				return fmt::format_to(ctx.out(), "16 Bits");
+			case sbsar::BitDepth::BPP32:
+				return fmt::format_to(ctx.out(), "32 Bits");
+		}
 	}
 };

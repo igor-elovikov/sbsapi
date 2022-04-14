@@ -162,7 +162,7 @@ PYBIND11_MODULE(pysbsar, m)
 						  spdlog::warn("Python Buffer Object: Float8 is not a valid format!");
 						  break;
 					  case sbsar::BitDepth::BPP16:
-						  info.format = py::format_descriptor<float>::format();
+						  info.format = "e"; //py::format_descriptor<float>::format(); // "e"?
 						  info.itemsize = sizeof(uint16_t);
 						  break;
 					  case sbsar::BitDepth::BPP32:

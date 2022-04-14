@@ -86,6 +86,8 @@ Image::Image(sbs::OutputInstance* output_instance)
 	width = texture.level0Width;
 	height = texture.level0Height;
 
+	spdlog::debug("dtype: {}", (int)format.dtype);
+
 	spdlog::debug("Grab image from output [{}]: Size:{}x{} Format: {:07b}",
 	  output_instance->mDesc.mIdentifier, width, height, texture.pixelFormat);
 }
