@@ -1,44 +1,82 @@
-//
-// Created by elovikov on 07/04/2022.
-//
-
-#include "sbsar.h"
-
-#include "sbsar/Context.h"
+#pragma once
+#include "sbsapi_export.h"
+#include "common.h"
 #include "sbsar/Package.h"
+#include "sbsar/Context.h"
 
-#include <spdlog/spdlog.h>
+std::unique_ptr<sbsar::Context> ctx;
 
-static auto graph_id = 0u;
+extern "C" {
 
-struct APIContext {
-	static std::map<std::string, std::unique_ptr<sbsar::Package>> loaded_packages;
+struct StringHandle {
+	const char* data;
+	uint32_t size;
 };
 
-std::unique_ptr<APIContext> ctx;
-
-
-void sbsar_init_context()
+SBSAPI_EXPORT auto sbsar_init_context() -> void
 {
-	spdlog::info("Initialize API context");
-	ctx = std::make_unique<APIContext>();
-	graph_id = 0u;
+	ctx = std::make_unique<sbsar::Context>();
 }
 
-void sbsar_shutdown()
+SBSAPI_EXPORT auto sbsar_shutdown() -> void
 {
-	spdlog::info("Shutdown API");
 	ctx.reset();
 }
 
-void sbsar_graph_render(sbsar::Graph* graph)
+
+// Package
+SBSAPI_EXPORT auto sbsar_load_package(const char* filename) -> sbsar::Package*
 {
-	graph->render();
+	return &ctx->load_package(filename);
 }
 
-void sbsar_graph_set_value_float(sbsar::Graph* graph, const char* parm_name, float value)
+SBSAPI_EXPORT auto sbsar_package_get_graph(sbsar::Package* package, const char* id) -> sbsar::Graph*
 {
-	if (graph->has_parm(parm_name)) {
-		graph->parm(parm_name).set(value);
-	}
+	return &package->graph(id);
+}
+
+SBSAPI_EXPORT auto sbsar_package_get_num_graphs(sbsar::Package* package) -> uint32_t
+{
+	return package->graphs().size();
+}
+
+SBSAPI_EXPORT auto sbsar_package_get_graphs(sbsar::Package* package, sbsar::Graph* graphs) -> void
+{
+}
+
+// Graph
+SBSAPI_EXPORT auto sbsar_graph_get_id(sbsar::Graph* graph, StringHandle* id) -> void;
+SBSAPI_EXPORT auto sbsar_graph_get_label(sbsar::Graph* graph, StringHandle* label) -> void;
+
+SBSAPI_EXPORT auto sbsar_graph_render(sbsar::Graph* graph) -> void;
+SBSAPI_EXPORT auto sbsar_graph_get_parm(sbsar::Graph* graph, const char* id) -> sbsar::Parameter*;
+SBSAPI_EXPORT auto sbsar_graph_get_input(sbsar::Graph* graph, const char* id) -> sbsar::Input*;
+SBSAPI_EXPORT auto sbsar_graph_get_output(sbsar::Graph* graph, const char* id) -> sbsar::Output*;
+
+// Parameters
+SBSAPI_EXPORT auto sbsar_parm_get_label(sbsar::Parameter* parm, StringHandle* label) -> void;
+SBSAPI_EXPORT auto sbsar_parm_get_widget(sbsar::Parameter* parm, sbsar::ParameterWidget* widget) -> void;
+
+SBSAPI_EXPORT auto sbsar_parm_set_value_string(sbsar::Parameter* parm, const char* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_set_value_float(sbsar::Parameter* parm, float* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_set_value_float2(sbsar::Parameter* parm, sbs::Vec2Float* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_set_value_float3(sbsar::Parameter* parm, sbs::Vec3Float* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_set_value_float4(sbsar::Parameter* parm, sbs::Vec4Float* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_set_value_int(sbsar::Parameter* parm, int* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_set_value_int2(sbsar::Parameter* parm, sbs::Vec2Int* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_set_value_int3(sbsar::Parameter* parm, sbs::Vec3Int* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_set_value_int4(sbsar::Parameter* parm, sbs::Vec4Int* value) -> void;
+
+SBSAPI_EXPORT auto sbsar_parm_get_value_string(sbsar::Parameter* parm, StringHandle* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_get_value_float(sbsar::Parameter* parm, float* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_get_value_float2(sbsar::Parameter* parm, sbs::Vec2Float* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_get_value_float3(sbsar::Parameter* parm, sbs::Vec3Float* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_get_value_float4(sbsar::Parameter* parm, sbs::Vec4Float* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_get_value_int(sbsar::Parameter* parm, int* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_get_value_int2(sbsar::Parameter* parm, sbs::Vec2Int* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_get_value_int3(sbsar::Parameter* parm, sbs::Vec3Int* value) -> void;
+SBSAPI_EXPORT auto sbsar_parm_get_value_int4(sbsar::Parameter* parm, sbs::Vec4Int* value) -> void;
+
+SBSAPI_EXPORT auto sbsar_shutdown() -> void;
+
 }

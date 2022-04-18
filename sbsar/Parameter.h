@@ -26,7 +26,11 @@ class Parameter {
 	}
 
 public:
-	Parameter() = default;
+	Parameter() = delete;
+	Parameter(Parameter&) = delete;
+	Parameter(Parameter&&) = default;
+	explicit Parameter(const sbs::InputDescBase* desc) { sbs_descriptor = desc; }
+
 	auto descriptor() { return sbs_descriptor; }
 
 	[[nodiscard]] auto type() const { return io_types_map.at(sbs_descriptor->mType); }
@@ -85,7 +89,7 @@ public:
 
 	[[nodiscard]] auto label_true() const -> std::string
 	{
-		auto result = std::string {};
+		auto result = std::string{};
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
@@ -100,7 +104,7 @@ public:
 
 	[[nodiscard]] auto label_false() const -> std::string
 	{
-		auto result = std::string {};
+		auto result = std::string{};
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
@@ -212,7 +216,7 @@ public:
 					auto builtin_type = meta::get_builtin_type(t);
 					using builtin_t = typename decltype(builtin_type)::type;
 					auto choices = choices_as<builtin_t>();
-					for (auto&[v, k] : choices) {
+					for (auto& [v, k] : choices) {
 						result.push_back(std::make_pair(Value(v), k));
 					}
 				}

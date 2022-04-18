@@ -10,14 +10,14 @@ class Output {
 
 	friend class Graph;
 
-	sbs::OutputDesc sbs_descriptor;
+	const sbs::OutputDesc* sbs_descriptor;
 	sbs::OutputInstance* instance = nullptr;
 
 	std::unique_ptr<Image> render_result;
 
 	auto set_format_from_descriptor()
 	{
-		format = PixelFormat((SubstancePixelFormat)sbs_descriptor.mFormat);
+		format = PixelFormat((SubstancePixelFormat)sbs_descriptor->mFormat);
 	}
 
 public:
@@ -29,7 +29,10 @@ public:
 	std::string label;
 	std::vector<std::string> usages;
 
-	Output() = default;
+	Output() = delete;
+	Output(Output&) = delete;
+	Output(Output&&) = default;
+	explicit Output(const sbs::OutputDesc* desc) { sbs_descriptor = desc; }
 
 	auto grab_result() -> void;
 	auto save(const std::string& filename) -> void;

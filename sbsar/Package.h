@@ -16,6 +16,10 @@ class Package {
 	std::string url;
 	Context* ctx = nullptr;
 
+	std::unordered_map<std::string, Graph&> graphs_map;
+	std::vector<Graph> graphs_container;
+	std::vector<Graph> custom_instances;
+
 public:
 
 	sbs::GraphInstances instances;
@@ -23,7 +27,8 @@ public:
 	Package() = default;
 	~Package()
 	{
-		graphs.clear();
+		graphs_map.clear();
+		graphs_container.clear();
 		instances.clear();
 
 		spdlog::debug("Unload package {}", url);
@@ -35,13 +40,10 @@ public:
 	}
 
 	std::unique_ptr<sbs::PackageDesc> descriptor;
-	std::vector<std::shared_ptr<sbs::GraphDesc>> graph_descriptors;
-	std::unordered_map<std::string, Graph> graphs;
-	std::vector<Graph> custom_instances;
 
-	auto init_graph_descriptors() -> void;
 	auto load_from_file(const std::string& path, bool instantiate = true) -> void;
-	auto& graph(const std::string& id) { return graphs[id]; }
+	[[nodiscard]] auto& graph(const std::string& id) const { return graphs_map.at(id); }
+	[[nodiscard]] const auto& graphs() const { return graphs_container; }
 };
 
 }

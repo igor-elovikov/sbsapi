@@ -11,7 +11,10 @@ class Input {
 	sbs::InputImage::SPtr input_image;
 
 public:
-	Input() = default;
+	Input() = delete;
+	Input(Input&) = delete;
+	Input(Input&&) = default;
+	explicit Input(const sbs::InputDescImage* desc) { sbs_descriptor = desc; }
 
 	std::string label;
 	std::vector<std::string> usages;

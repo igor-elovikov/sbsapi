@@ -168,13 +168,13 @@ PYBIND11_MODULE(pysbsar, m)
 						  break;
 					  case sbsar::Precision::B32:
 						  info.format = py::format_descriptor<float>::format();
-						  info.itemsize = sizeof(float );
+						  info.itemsize = sizeof(float);
 						  break;
 				  }
 				  break;
 		  }
 
-		  info.strides = { info.itemsize * height * format.num_channels, info.itemsize * format.num_channels };
+		  info.strides = {info.itemsize * height * format.num_channels, info.itemsize * format.num_channels};
 
 		  return info;
 	  });
@@ -235,7 +235,8 @@ PYBIND11_MODULE(pysbsar, m)
 	  .def("inputs", &sbsar::Graph::inputs);
 
 	py::class_<sbsar::Package>(m, "Package")
-	  .def("graph", &sbsar::Package::graph, py::return_value_policy::reference);
+	  .def("graph", &sbsar::Package::graph, "id"_a, py::return_value_policy::reference)
+	  .def("graphs", &sbsar::Package::graphs, py::return_value_policy::reference);
 
 	py::class_<sbsar::Context>(m, "Context")
 	  .def(py::init<>())
