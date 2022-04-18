@@ -37,9 +37,9 @@ auto get_oiio_type(const Image& image) -> oiio::TypeDesc
 	}
 }
 
-auto get_format_from_oiio(const oiio::TypeDesc& type_desc) -> ImageFormat
+auto get_format_from_oiio(const oiio::TypeDesc& type_desc) -> PixelFormat
 {
-	auto format = ImageFormat{};
+	auto format = PixelFormat{};
 	switch (type_desc.basetype) {
 		case oiio::TypeDesc::UCHAR:
 			format.dtype = DataType::INTEGER;
@@ -82,7 +82,7 @@ Image::Image(sbs::OutputInstance* output_instance)
 	is_rendered = true;
 	auto texture = rendered_image->getTexture();
 
-	format = ImageFormat((SubstancePixelFormat)texture.pixelFormat);
+	format = PixelFormat((SubstancePixelFormat)texture.pixelFormat);
 	width = texture.level0Width;
 	height = texture.level0Height;
 

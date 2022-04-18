@@ -67,8 +67,8 @@ public:
 	[[nodiscard]] const auto& inputs() const { return input_names_ordered; }
 
 	auto render(bool grab_results = true) -> void;
-	auto set_resolution(Resolution resolution) -> void { set_resolution(resolution, resolution); }
-	auto set_resolution(Resolution resolution_x, Resolution resolution_y) -> void;
+	auto set_resolution(OutputSize resolution) -> void { set_resolution(resolution, resolution); }
+	auto set_resolution(OutputSize resolution_x, OutputSize resolution_y) -> void;
 };
 
 }

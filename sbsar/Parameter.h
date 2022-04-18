@@ -14,15 +14,15 @@ class Parameter {
 	sbs::InputInstanceBase* instance = nullptr;
 
 	template <typename T>
-	[[nodiscard]] auto get_instance_pointer() const -> typename SbsInput<T>::instance_type
+	[[nodiscard]] auto get_instance_pointer() const -> typename meta::SbsInput<T>::instance_type
 	{
-		return dynamic_cast<typename SbsInput<T>::instance_type>(instance);
+		return dynamic_cast<typename meta::SbsInput<T>::instance_type>(instance);
 	}
 
 	template <typename T>
-	[[nodiscard]] auto get_desc_pointer() const -> typename SbsInput<T>::descriptor_type
+	[[nodiscard]] auto get_desc_pointer() const -> typename meta::SbsInput<T>::descriptor_type
 	{
-		return dynamic_cast<typename SbsInput<T>::descriptor_type>(sbs_descriptor);
+		return dynamic_cast<typename meta::SbsInput<T>::descriptor_type>(sbs_descriptor);
 	}
 
 public:
@@ -56,13 +56,13 @@ public:
 	[[nodiscard]] auto slider_step() const -> float
 	{
 		auto result = 0.f;
-		hana::for_each(sbs_parm_types, [&](auto& t) {
-			auto io = get_type_io(t);
+		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = get_builtin_type(t);
+				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
 				auto desc_pointer = get_desc_pointer<builtin_t>();
-				result = SbsInput<builtin_t>::get_slider_step(desc_pointer);
+				result = meta::SbsInput<builtin_t>::get_slider_step(desc_pointer);
 			}
 		});
 		return result;
@@ -71,13 +71,13 @@ public:
 	[[nodiscard]] auto slider_clamp() const -> bool
 	{
 		auto result = false;
-		hana::for_each(sbs_parm_types, [&](auto& t) {
-			auto io = get_type_io(t);
+		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = get_builtin_type(t);
+				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
 				auto desc_pointer = get_desc_pointer<builtin_t>();
-				result = SbsInput<builtin_t>::get_slider_clamp(desc_pointer);
+				result = meta::SbsInput<builtin_t>::get_slider_clamp(desc_pointer);
 			}
 		});
 		return result;
@@ -86,13 +86,13 @@ public:
 	[[nodiscard]] auto label_true() const -> std::string
 	{
 		auto result = std::string {};
-		hana::for_each(sbs_parm_types, [&](auto& t) {
-			auto io = get_type_io(t);
+		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = get_builtin_type(t);
+				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
 				auto desc_pointer = get_desc_pointer<builtin_t>();
-				result = SbsInput<builtin_t>::get_label_true(desc_pointer);
+				result = meta::SbsInput<builtin_t>::get_label_true(desc_pointer);
 			}
 		});
 		return result;
@@ -101,13 +101,13 @@ public:
 	[[nodiscard]] auto label_false() const -> std::string
 	{
 		auto result = std::string {};
-		hana::for_each(sbs_parm_types, [&](auto& t) {
-			auto io = get_type_io(t);
+		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = get_builtin_type(t);
+				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
 				auto desc_pointer = get_desc_pointer<builtin_t>();
-				result = SbsInput<builtin_t>::get_label_false(desc_pointer);
+				result = meta::SbsInput<builtin_t>::get_label_false(desc_pointer);
 			}
 		});
 		return result;
@@ -116,7 +116,7 @@ public:
 	template <typename T>
 	auto is() -> bool
 	{
-		static constexpr auto type_info = info_from_type<T>;
+		static constexpr auto type_info = meta::info_from_type<T>;
 		static constexpr auto io = get_type_io(type_info);
 		return io == sbs_descriptor->mType;
 	}
@@ -127,16 +127,16 @@ public:
 		auto desc_pointer = get_desc_pointer<T>();
 		if (!desc_pointer) return T{};
 
-		return SbsInput<T>::get_default_value(desc_pointer);
+		return meta::SbsInput<T>::get_default_value(desc_pointer);
 	};
 
-	auto default_value() -> sbs_value_variant_t
+	auto default_value() -> Value
 	{
-		auto result = sbs_value_variant_t{};
-		hana::for_each(sbs_parm_types, [&](auto& t) {
-			auto io = get_type_io(t);
+		auto result = Value{};
+		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = get_builtin_type(t);
+				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
 				result = default_value_as<builtin_t>();
 			}
@@ -150,17 +150,17 @@ public:
 		auto desc_pointer = get_desc_pointer<T>();
 		if (!desc_pointer) return T{};
 
-		return SbsInput<T>::get_max_value(desc_pointer);
+		return meta::SbsInput<T>::get_max_value(desc_pointer);
 	};
 
-	auto max_value() -> sbs_value_variant_t
+	auto max_value() -> Value
 	{
-		auto result = sbs_value_variant_t{};
+		auto result = Value{};
 		if (sbs_descriptor->isNumerical()) {
-			hana::for_each(sbs_parm_types, [&](auto& t) {
-				auto io = get_type_io(t);
+			hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+				auto io = meta::get_type_io(t);
 				if (io == sbs_descriptor->mType) {
-					auto builtin_type = get_builtin_type(t);
+					auto builtin_type = meta::get_builtin_type(t);
 					using builtin_t = typename decltype(builtin_type)::type;
 					result = max_value_as<builtin_t>();
 				}
@@ -175,17 +175,17 @@ public:
 		auto desc_pointer = get_desc_pointer<T>();
 		if (!desc_pointer) return T{};
 
-		return SbsInput<T>::get_min_value(desc_pointer);
+		return meta::SbsInput<T>::get_min_value(desc_pointer);
 	};
 
-	auto min_value() -> sbs_value_variant_t
+	auto min_value() -> Value
 	{
-		auto result = sbs_value_variant_t{};
+		auto result = Value{};
 		if (sbs_descriptor->isNumerical()) {
-			hana::for_each(sbs_parm_types, [&](auto& t) {
-				auto io = get_type_io(t);
+			hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+				auto io = meta::get_type_io(t);
 				if (io == sbs_descriptor->mType) {
-					auto builtin_type = get_builtin_type(t);
+					auto builtin_type = meta::get_builtin_type(t);
 					using builtin_t = typename decltype(builtin_type)::type;
 					result = min_value_as<builtin_t>();
 				}
@@ -195,25 +195,25 @@ public:
 	};
 
 	template <typename T>
-	auto choices_as() -> typename SbsInput<T>::choice_type
+	auto choices_as() -> typename meta::SbsInput<T>::choice_type
 	{
 		auto desc_pointer = get_desc_pointer<T>();
-		return SbsInput<T>::choices(desc_pointer);
+		return meta::SbsInput<T>::choices(desc_pointer);
 	};
 
-	auto choices() -> std::vector<std::pair<sbs_value_variant_t, std::string>>
+	auto choices() -> std::vector<std::pair<Value, std::string>>
 	{
-		using variant_choices = std::vector<std::pair<sbs_value_variant_t, std::string>>;
-		auto result = std::vector<std::pair<sbs_value_variant_t, std::string>>{};
+		using variant_choices = std::vector<std::pair<Value, std::string>>;
+		auto result = std::vector<std::pair<Value, std::string>>{};
 		if (sbs_descriptor->isNumerical()) {
-			hana::for_each(sbs_parm_types, [&](auto& t) {
-				auto io = get_type_io(t);
+			hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+				auto io = meta::get_type_io(t);
 				if (io == sbs_descriptor->mType) {
-					auto builtin_type = get_builtin_type(t);
+					auto builtin_type = meta::get_builtin_type(t);
 					using builtin_t = typename decltype(builtin_type)::type;
 					auto choices = choices_as<builtin_t>();
 					for (auto&[v, k] : choices) {
-						result.push_back(std::make_pair(sbs_value_variant_t(v), k));
+						result.push_back(std::make_pair(Value(v), k));
 					}
 				}
 			});
@@ -227,20 +227,20 @@ public:
 		if (instance) {
 			auto instance_pointer = get_instance_pointer<T>();
 			if (!instance_pointer) return T{};
-			return SbsInput<T>::get_value(instance_pointer);
+			return meta::SbsInput<T>::get_value(instance_pointer);
 		}
 		else {
 			return default_value_as<T>();
 		}
 	}
 
-	auto get() -> sbs_value_variant_t
+	auto get() -> Value
 	{
-		auto result = sbs_value_variant_t{};
-		hana::for_each(sbs_parm_types, [&](auto& t) {
-			auto io = get_type_io(t);
+		auto result = Value{};
+		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = get_builtin_type(t);
+				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
 				result = get_as<builtin_t>();
 			}
@@ -256,14 +256,14 @@ public:
 		auto instance_pointer = get_instance_pointer<T>();
 		if (!instance_pointer) return;
 
-		SbsInput<T>::apply_value(instance_pointer, v);
+		meta::SbsInput<T>::apply_value(instance_pointer, v);
 	}
 
 	template <>
-	auto set(const sbs_value_variant_t& v) -> void
+	auto set(const Value& v) -> void
 	{
-		hana::for_each(sbs_parm_types, [&](auto& t) {
-			auto builtin_type = get_builtin_type(t);
+		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
+			auto builtin_type = meta::get_builtin_type(t);
 			using builtin_t = typename decltype(builtin_type)::type;
 			if (std::holds_alternative<builtin_t>(v)) {
 				set<builtin_t>(std::get<builtin_t>(v));

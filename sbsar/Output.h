@@ -17,14 +17,14 @@ class Output {
 
 	auto set_format_from_descriptor()
 	{
-		format = ImageFormat((SubstancePixelFormat)sbs_descriptor.mFormat);
+		format = PixelFormat((SubstancePixelFormat)sbs_descriptor.mFormat);
 	}
 
 public:
 
 	const auto& descriptor() { return sbs_descriptor; }
 
-	ImageFormat format{};
+	PixelFormat format{};
 
 	std::string label;
 	std::vector<std::string> usages;
@@ -33,6 +33,9 @@ public:
 
 	auto grab_result() -> void;
 	auto save(const std::string& filename) -> void;
+	auto override_format(const OutputFormatOverride& format_override) -> void;
+	auto override_format(const OutputResolution& resolution) -> void;
+	auto override_format(const PixelFormat& pixel_format) -> void;
 
 	[[nodiscard]] auto get_raw_data() const -> void*
 	{

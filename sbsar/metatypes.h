@@ -9,10 +9,13 @@
 namespace hana = boost::hana;
 using namespace hana::literals;
 
+namespace sbsar {
+namespace meta {
+
 template <typename T, SubstanceIOType IOType>
 constexpr auto sbs_types_info = hana::make_tuple(
-  hana::type_c<T>, // builtin instance_type
-  hana::integral_constant<SubstanceIOType, IOType>{} // IO enum
+  hana::type_c < T > , // builtin instance_type
+  hana::integral_constant < SubstanceIOType, IOType > {} // IO enum
 );
 
 constexpr auto get_builtin_type = hana::reverse_partial(hana::at, 0_c);
@@ -33,12 +36,12 @@ constexpr auto sbs_parm_types = hana::make_tuple(
 
 template <typename T>
 constexpr auto info_from_type = hana::find_if(sbs_parm_types, [](auto t) {
-	return hana::equal(get_builtin_type(t), hana::type_c<T>);
+	return hana::equal(get_builtin_type(t), hana::type_c < T > );
 }).value();
 
 template <SubstanceIOType io>
 constexpr auto info_from_io = hana::find_if(sbs_parm_types, [](auto t) {
-	return hana::equal(get_type_io_c(t), hana::integral_constant<SubstanceIOType, io>{});
+	return hana::equal(get_type_io_c(t), hana::integral_constant < SubstanceIOType, io > {});
 }).value();
 
 template <typename ...Ts>
@@ -96,3 +99,9 @@ struct SbsInput<sbs::string> {
 		return {};
 	}
 };
+
+}
+
+using Value = meta::sbs_value_variant_t;
+
+}

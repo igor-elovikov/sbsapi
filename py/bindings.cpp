@@ -47,11 +47,11 @@ PYBIND11_MODULE(pysbsar, m)
 	  .value("INTEGER", sbsar::DataType::INTEGER)
 	  .value("FLOAT", sbsar::DataType::FLOAT);
 
-	py::class_<sbsar::ImageFormat>(m, "ImageFormat")
-	  .def_readwrite("depth", &sbsar::ImageFormat::precision)
-	  .def_readwrite("format", &sbsar::ImageFormat::format)
-	  .def_readwrite("dtype", &sbsar::ImageFormat::dtype)
-	  .def_readwrite("num_channels", &sbsar::ImageFormat::num_channels);
+	py::class_<sbsar::PixelFormat>(m, "PixelFormat")
+	  .def_readwrite("depth", &sbsar::PixelFormat::precision)
+	  .def_readwrite("format", &sbsar::PixelFormat::format)
+	  .def_readwrite("dtype", &sbsar::PixelFormat::dtype)
+	  .def_readwrite("num_channels", &sbsar::PixelFormat::num_channels);
 
 	py::class_<sbs::Vec2Int>(m, "Vec2Int")
 	  .def(py::init<int, int>(), "x"_a, "y"_a)
@@ -117,8 +117,8 @@ PYBIND11_MODULE(pysbsar, m)
 	  .def("choices", &sbsar::Parameter::choices)
 	  .def("set", &sbsar::Parameter::set<std::string>, "value"_a);
 
-	hana::for_each(sbs_parm_types, [&](auto& t) {
-		auto builtin_type = get_builtin_type(t);
+	hana::for_each(sbsar::meta::sbs_parm_types, [&](auto& t) {
+		auto builtin_type = sbsar::meta::get_builtin_type(t);
 		using builtin_t = typename decltype(builtin_type)::type;
 		parm_class.def("set", &sbsar::Parameter::set<builtin_t>, "value"_a);
 	});
@@ -186,7 +186,7 @@ PYBIND11_MODULE(pysbsar, m)
 		  auto shape = info.shape;
 		  if (shape.size() < 2) return;
 
-		  auto format = sbsar::ImageFormat{};
+		  auto format = sbsar::PixelFormat{};
 		  format.num_channels = shape.size() > 2 ? static_cast<int>(shape[2]) : 1;
 
 		  if (info.format == py::format_descriptor<unsigned char>::format()) {

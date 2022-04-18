@@ -47,14 +47,36 @@ enum class DataType {
 	FLOAT
 };
 
-struct ImageFormat {
+enum class OutputSize {
+	x1,
+	x2,
+	x4,
+	x16,
+	x32,
+	x64,
+	x128,
+	x256,
+	x512,
+	x1024,
+	x2048,
+	x4096,
+	x8192,
+	NONE
+};
+
+struct OutputResolution {
+	OutputSize width;
+	OutputSize height;
+};
+
+struct PixelFormat {
 	Precision precision;
 	DataFormat format;
 	DataType dtype;
 	int num_channels;
 
-	ImageFormat() = default;
-	explicit ImageFormat(SubstancePixelFormat pixel_format)
+	PixelFormat() = default;
+	explicit PixelFormat(SubstancePixelFormat pixel_format)
 	{
 		int sbs_precision = pixel_format & Substance_PF_MASK_RAWPrecision;
 		int channels = pixel_format & Substance_PF_MASK_RAWChannels;
@@ -158,20 +180,9 @@ struct ImageFormat {
 	}
 };
 
-enum class Resolution {
-	x1,
-	x2,
-	x4,
-	x16,
-	x32,
-	x64,
-	x128,
-	x256,
-	x512,
-	x1024,
-	x2048,
-	x4096,
-	x8192
+struct OutputFormatOverride {
+	PixelFormat format;
+	OutputResolution resolution;
 };
 
 static inline const auto io_types_map = std::unordered_map<SubstanceIOType, ParameterType>{
@@ -186,6 +197,6 @@ static inline const auto io_types_map = std::unordered_map<SubstanceIOType, Para
   {Substance_IOType_Integer4, ParameterType::INTEGER4}
 };
 
-static inline auto get_image_format(SubstancePixelFormat pixel_format) { return ImageFormat(pixel_format); }
+static inline auto get_image_format(SubstancePixelFormat pixel_format) { return PixelFormat(pixel_format); }
 
 }

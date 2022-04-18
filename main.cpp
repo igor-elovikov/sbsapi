@@ -1,6 +1,5 @@
 #include "utils/common.h"
 #include "sbsar/Context.h"
-#include "sbsar/Package.h"
 
 const auto sbsar_path = "C:/Users/elovikov/OneDrive/sbs/Unity/ring.sbsar";
 
@@ -14,7 +13,7 @@ int main()
 	auto& graph = pkg.graphs["ring"];
 	auto& out = pkg.graphs["ring"].output("output");
 
-	graph.set_resolution(sbsar::Resolution::x1024);
+	graph.set_resolution(sbsar::OutputSize::x1024);
 	auto v = graph.parm("Radius").get();
 
 	graph.parm("Radius").set(0.4f);

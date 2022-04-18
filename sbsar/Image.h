@@ -30,7 +30,7 @@ public:
 		load(filename);
 	}
 
-	ImageFormat format{};
+	PixelFormat format{};
 
 	int width = 0;
 	int height = 0;

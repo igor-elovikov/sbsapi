@@ -21,7 +21,7 @@ public:
 	[[nodiscard]] auto is_floating_point() const { return sbs_descriptor->mIsFPFormat; }
 
 	auto load_from_file(const std::string& filename) -> void;
-	auto load_from_buffer(void* data, int width, int height, ImageFormat format) -> void;
+	auto load_from_buffer(void* data, int width, int height, PixelFormat format) -> void;
 };
 
 }

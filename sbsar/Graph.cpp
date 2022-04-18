@@ -127,9 +127,9 @@ auto Graph::render(bool grab_results) -> void
 	}
 }
 
-auto Graph::set_resolution(Resolution resolution_x, Resolution resolution_y) -> void
+auto Graph::set_resolution(OutputSize resolution_x, OutputSize resolution_y) -> void
 {
-	if (!has_parm(size_parm_name)) return;
+	if (!has_parm(size_parm_name) || resolution_x == OutputSize::NONE || resolution_y == OutputSize::NONE) return;
 	auto size_parm = parm(size_parm_name);
 
 	size_parm.set(sbs::Vec2Int(

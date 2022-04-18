@@ -22,7 +22,7 @@ auto Input::load_from_file(const std::string& filename) -> void
 	instance->setImage(input_image);
 }
 
-auto Input::load_from_buffer(void* data, int width, int height, ImageFormat format) -> void
+auto Input::load_from_buffer(void* data, int width, int height, PixelFormat format) -> void
 {
 	if (!instance) return;
 
