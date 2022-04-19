@@ -16,8 +16,9 @@ class Package {
 	std::string url;
 	Context* ctx = nullptr;
 
-	std::unordered_map<std::string, Graph&> graphs_map;
 	std::vector<Graph> graphs_container;
+	std::unordered_map<std::string, Graph&> graphs_map;
+
 	std::vector<Graph> custom_instances;
 
 public:
@@ -42,8 +43,8 @@ public:
 	std::unique_ptr<sbs::PackageDesc> descriptor;
 
 	auto load_from_file(const std::string& path, bool instantiate = true) -> void;
-	[[nodiscard]] auto& graph(const std::string& id) const { return graphs_map.at(id); }
-	[[nodiscard]] const auto& graphs() const { return graphs_container; }
+	[[nodiscard]] auto& graph(const std::string& id) { return graphs_map.at(id); }
+	[[nodiscard]] auto& graphs() { return graphs_container; }
 };
 
 }

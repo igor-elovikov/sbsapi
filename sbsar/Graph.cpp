@@ -8,14 +8,14 @@ auto Graph::link_instance() -> void
 	if (!instance) return;
 	auto& inputs = instance->getInputs();
 
-	if (!descriptor) return;
+	if (!sbs_descriptor) return;
 
 	for (auto& input : inputs) {
 		auto id = std::string(input->mDesc.mIdentifier);
 
 		if (input->mDesc.isNumerical()) {
 			if (has_parm(id)) {
-				parms_map.at(id)->instance = input;
+				parms_map.at(id).instance = input;
 			}
 			else {
 				spdlog::warn("Couldn't find descriptor for parameter [{}]", id);
@@ -23,7 +23,7 @@ auto Graph::link_instance() -> void
 		}
 		else if (input->mDesc.isImage()) {
 			if (has_input(id)) {
-				inputs_map.at(id)->instance = dynamic_cast<sbs::InputInstanceImage*>(input);
+				inputs_map.at(id).instance = dynamic_cast<sbs::InputInstanceImage*>(input);
 			}
 			else {
 				spdlog::warn("Couldn't find descriptor for input [{}]", id);
@@ -37,7 +37,7 @@ auto Graph::link_instance() -> void
 		if (!instance_output->mDesc.isImage()) continue;
 		auto id = std::string(instance_output->mDesc.mIdentifier);
 		if (has_output(id)) {
-			outputs_map.at(id)->instance = instance_output;
+			outputs_map.at(id).instance = instance_output;
 		}
 		else {
 			spdlog::warn("Couldn't find output descriptor for {}", instance_output->mDesc.mIdentifier);
@@ -47,29 +47,29 @@ auto Graph::link_instance() -> void
 
 auto Graph::load_outputs() -> void
 {
-	if (!descriptor) return;
+	if (!sbs_descriptor) return;
 
-	auto& graph_outputs = descriptor->mOutputs;
+	auto& graph_outputs = sbs_descriptor->mOutputs;
 
 	outputs_map.clear();
 	outputs_container.clear();
 
 	for (const auto& graph_output : graph_outputs) {
 		auto id = std::string(graph_output.mIdentifier);
-
 		auto& output = outputs_container.emplace_back(&graph_output);
-		outputs_map[id] = &output;
-
-		output.usages = graph_output.mChannelsStr | rn::to<std::vector<std::string>>;
 		output.set_format_from_descriptor();
+	}
+
+	for (auto& output : outputs_container) {
+		outputs_map.try_emplace(output.id(), output);
 	}
 }
 
 auto Graph::load_parameters() -> void
 {
-	if (!descriptor) return;
+	if (!sbs_descriptor) return;
 
-	auto& inputs = descriptor->mInputs;
+	auto& inputs = sbs_descriptor->mInputs;
 
 	parms_map.clear();
 	parms_container.clear();
@@ -77,17 +77,20 @@ auto Graph::load_parameters() -> void
 	for (const auto& input : inputs) {
 		if (input->isImage()) continue;
 		auto id = std::string(input->mIdentifier);
-
 		auto& parm = parms_container.emplace_back(input);
-		parms_map[id] = &parm;
 	}
+
+	for (auto& input : parms_container) {
+		parms_map.try_emplace(input.id(), input);
+	}
+
 }
 
 auto Graph::load_inputs() -> void
 {
-	if (!descriptor) return;
+	if (!sbs_descriptor) return;
 
-	auto& graph_inputs = descriptor->mInputs;
+	auto& graph_inputs = sbs_descriptor->mInputs;
 
 	inputs_map.clear();
 	inputs_container.clear();
@@ -95,13 +98,13 @@ auto Graph::load_inputs() -> void
 	for (const auto& graph_input : graph_inputs) {
 		if (!graph_input->isImage()) continue;
 		auto id = std::string(graph_input->mIdentifier);
-
 		auto& input = inputs_container.emplace_back(dynamic_cast<const sbs::InputDescImage*>(graph_input));
-		inputs_map[id] = &input;
-
-		input.label = input.sbs_descriptor->mLabel;
-		input.user_tag = input.sbs_descriptor->mUserTag;
 	}
+
+	for (auto& input : inputs_container) {
+		inputs_map.try_emplace(input.id(), input);
+	}
+
 }
 
 auto Graph::render(bool grab_results) -> void

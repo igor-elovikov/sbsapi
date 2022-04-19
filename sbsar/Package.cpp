@@ -25,7 +25,6 @@ auto Package::load_from_file(const std::string& path, bool instantiate) -> void
 		graph_url = graph_url.substr(6);
 
 		auto& graph = graphs_container.emplace_back(pkg_graph);
-		graphs_map.try_emplace(graph_url, graph);
 
 		graph.ctx = ctx;
 		graph.url = graph_url;
@@ -38,6 +37,10 @@ auto Package::load_from_file(const std::string& path, bool instantiate) -> void
 			graph.instance = std::make_unique<sbs::GraphInstance>(pkg_graph);
 			graph.link_instance();
 		}
+	}
+
+	for (auto& graph : graphs_container) {
+		graphs_map.try_emplace(graph.url, graph);
 	}
 
 }

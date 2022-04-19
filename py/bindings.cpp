@@ -230,9 +230,9 @@ PYBIND11_MODULE(pysbsar, m)
 	  .def("parm", &sbsar::Graph::parm, py::return_value_policy::reference)
 	  .def("output", &sbsar::Graph::output, py::return_value_policy::reference)
 	  .def("input", &sbsar::Graph::input, py::return_value_policy::reference)
-	  .def("parms", &sbsar::Graph::parms)
-	  .def("outputs", &sbsar::Graph::outputs)
-	  .def("inputs", &sbsar::Graph::inputs);
+	  .def("parms", &sbsar::Graph::parms, py::return_value_policy::reference)
+	  .def("outputs", &sbsar::Graph::outputs, py::return_value_policy::reference)
+	  .def("inputs", &sbsar::Graph::inputs, py::return_value_policy::reference);
 
 	py::class_<sbsar::Package>(m, "Package")
 	  .def("graph", &sbsar::Package::graph, "id"_a, py::return_value_policy::reference)

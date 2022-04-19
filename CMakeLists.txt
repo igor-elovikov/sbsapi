@@ -41,9 +41,9 @@ target_include_directories(sbsarlib PUBLIC
         "${SBS_SDK_PATH}/include")
 
 # sbsar C API
-add_library(sbsapi SHARED api/sbsar.cpp)
+add_library(sbsapi SHARED capi/sbsar.cpp)
 target_include_directories(sbsapi PUBLIC
-        api
+        capi
         )
 target_link_libraries(sbsapi PUBLIC sbsarlib)
 

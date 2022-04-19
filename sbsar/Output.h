@@ -5,7 +5,7 @@
 
 namespace sbsar {
 
-// currently, only image outputs_map
+// currently, only image outputs
 class Output {
 
 	friend class Graph;
@@ -26,13 +26,13 @@ public:
 
 	PixelFormat format{};
 
-	std::string label;
-	std::vector<std::string> usages;
-
 	Output() = delete;
 	Output(Output&) = delete;
 	Output(Output&&) = default;
 	explicit Output(const sbs::OutputDesc* desc) { sbs_descriptor = desc; }
+
+	[[nodiscard]] auto id() const { return static_cast<std::string>(sbs_descriptor->mIdentifier); }
+	[[nodiscard]] auto label() const { return static_cast<std::string>(sbs_descriptor->mLabel); }
 
 	auto grab_result() -> void;
 	auto save(const std::string& filename) -> void;

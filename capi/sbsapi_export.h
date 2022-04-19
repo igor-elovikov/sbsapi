@@ -9,7 +9,7 @@
 #  ifndef SBSAPI_EXPORT
 #    ifdef sbsapi_EXPORTS
         /* We are building this library */
-#      define SBSAPI_EXPORT __declspec(dllexport)
+#      define SBSAPI_EXPORT [[maybe_unused]] __declspec(dllexport)
 #    else
         /* We are using this library */
 #      define SBSAPI_EXPORT __declspec(dllimport)

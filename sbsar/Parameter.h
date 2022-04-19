@@ -14,15 +14,9 @@ class Parameter {
 	sbs::InputInstanceBase* instance = nullptr;
 
 	template <typename T>
-	[[nodiscard]] auto get_instance_pointer() const -> typename meta::SbsInput<T>::instance_type
+	[[nodiscard]] auto instance_for() const -> typename meta::SbsInput<T>::instance_type
 	{
 		return dynamic_cast<typename meta::SbsInput<T>::instance_type>(instance);
-	}
-
-	template <typename T>
-	[[nodiscard]] auto get_desc_pointer() const -> typename meta::SbsInput<T>::descriptor_type
-	{
-		return dynamic_cast<typename meta::SbsInput<T>::descriptor_type>(sbs_descriptor);
 	}
 
 public:
@@ -31,9 +25,16 @@ public:
 	Parameter(Parameter&&) = default;
 	explicit Parameter(const sbs::InputDescBase* desc) { sbs_descriptor = desc; }
 
-	auto descriptor() { return sbs_descriptor; }
+	[[nodiscard]] auto descriptor() const { return sbs_descriptor; }
+	template <typename T>
+	[[nodiscard]] auto descriptor_for() const -> typename meta::SbsInput<T>::descriptor_type
+	{
+		return dynamic_cast<typename meta::SbsInput<T>::descriptor_type>(sbs_descriptor);
+	}
+
 
 	[[nodiscard]] auto type() const { return io_types_map.at(sbs_descriptor->mType); }
+	[[nodiscard]] auto id() const { return static_cast<std::string>(sbs_descriptor->mIdentifier); }
 	[[nodiscard]] auto label() const { return static_cast<std::string>(sbs_descriptor->mLabel); }
 	[[nodiscard]] auto group() const { return static_cast<std::string>(sbs_descriptor->mGuiGroup); }
 	[[nodiscard]] auto usages() const { return sbs_descriptor->mChannelsStr | rn::to<std::vector<std::string>>; }
@@ -65,7 +66,7 @@ public:
 			if (io == sbs_descriptor->mType) {
 				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
-				auto desc_pointer = get_desc_pointer<builtin_t>();
+				auto desc_pointer = descriptor_for<builtin_t>();
 				result = meta::SbsInput<builtin_t>::get_slider_step(desc_pointer);
 			}
 		});
@@ -80,7 +81,7 @@ public:
 			if (io == sbs_descriptor->mType) {
 				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
-				auto desc_pointer = get_desc_pointer<builtin_t>();
+				auto desc_pointer = descriptor_for<builtin_t>();
 				result = meta::SbsInput<builtin_t>::get_slider_clamp(desc_pointer);
 			}
 		});
@@ -95,7 +96,7 @@ public:
 			if (io == sbs_descriptor->mType) {
 				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
-				auto desc_pointer = get_desc_pointer<builtin_t>();
+				auto desc_pointer = descriptor_for<builtin_t>();
 				result = meta::SbsInput<builtin_t>::get_label_true(desc_pointer);
 			}
 		});
@@ -110,7 +111,7 @@ public:
 			if (io == sbs_descriptor->mType) {
 				auto builtin_type = meta::get_builtin_type(t);
 				using builtin_t = typename decltype(builtin_type)::type;
-				auto desc_pointer = get_desc_pointer<builtin_t>();
+				auto desc_pointer = descriptor_for<builtin_t>();
 				result = meta::SbsInput<builtin_t>::get_label_false(desc_pointer);
 			}
 		});
@@ -128,7 +129,7 @@ public:
 	template <typename T>
 	auto default_value_as() -> T
 	{
-		auto desc_pointer = get_desc_pointer<T>();
+		auto desc_pointer = descriptor_for<T>();
 		if (!desc_pointer) return T{};
 
 		return meta::SbsInput<T>::get_default_value(desc_pointer);
@@ -151,7 +152,7 @@ public:
 	template <typename T>
 	auto max_value_as() -> T
 	{
-		auto desc_pointer = get_desc_pointer<T>();
+		auto desc_pointer = descriptor_for<T>();
 		if (!desc_pointer) return T{};
 
 		return meta::SbsInput<T>::get_max_value(desc_pointer);
@@ -176,7 +177,7 @@ public:
 	template <typename T>
 	auto min_value_as() -> T
 	{
-		auto desc_pointer = get_desc_pointer<T>();
+		auto desc_pointer = descriptor_for<T>();
 		if (!desc_pointer) return T{};
 
 		return meta::SbsInput<T>::get_min_value(desc_pointer);
@@ -201,7 +202,7 @@ public:
 	template <typename T>
 	auto choices_as() -> typename meta::SbsInput<T>::choice_type
 	{
-		auto desc_pointer = get_desc_pointer<T>();
+		auto desc_pointer = descriptor_for<T>();
 		return meta::SbsInput<T>::choices(desc_pointer);
 	};
 
@@ -229,7 +230,7 @@ public:
 	auto get_as() -> T
 	{
 		if (instance) {
-			auto instance_pointer = get_instance_pointer<T>();
+			auto instance_pointer = instance_for<T>();
 			if (!instance_pointer) return T{};
 			return meta::SbsInput<T>::get_value(instance_pointer);
 		}
@@ -257,7 +258,7 @@ public:
 	{
 		if (!instance) return;
 
-		auto instance_pointer = get_instance_pointer<T>();
+		auto instance_pointer = instance_for<T>();
 		if (!instance_pointer) return;
 
 		meta::SbsInput<T>::apply_value(instance_pointer, v);
