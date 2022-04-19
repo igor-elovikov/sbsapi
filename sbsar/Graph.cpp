@@ -109,7 +109,7 @@ auto Graph::load_inputs() -> void
 
 auto Graph::render(bool grab_results) -> void
 {
-	spdlog::debug("Rendering graph [{}]", url);
+	spdlog::debug("Rendering graph [{}]", package_url);
 	ctx->renderer.push(*instance);
 	ctx->renderer.run();
 	spdlog::debug("Done rendering");

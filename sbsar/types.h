@@ -51,6 +51,7 @@ enum class OutputSize {
 	x1,
 	x2,
 	x4,
+	x8,
 	x16,
 	x32,
 	x64,

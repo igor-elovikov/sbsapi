@@ -33,6 +33,9 @@ public:
 
 	[[nodiscard]] auto id() const { return static_cast<std::string>(sbs_descriptor->mIdentifier); }
 	[[nodiscard]] auto label() const { return static_cast<std::string>(sbs_descriptor->mLabel); }
+	[[nodiscard]] auto group() const { return static_cast<std::string>(sbs_descriptor->mGroup); }
+	[[nodiscard]] auto usages() const { return sbs_descriptor->mChannelsStr | rn::to<std::vector<std::string>>; }
+	[[nodiscard]] auto visible_condition() const { return static_cast<std::string>(sbs_descriptor->mGuiVisibleIf); }
 
 	auto grab_result() -> void;
 	auto save(const std::string& filename) -> void;

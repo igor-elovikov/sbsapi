@@ -27,7 +27,7 @@ auto Package::load_from_file(const std::string& path, bool instantiate) -> void
 		auto& graph = graphs_container.emplace_back(pkg_graph);
 
 		graph.ctx = ctx;
-		graph.url = graph_url;
+		graph.package_url = graph_url;
 
 		graph.load_parameters();
 		graph.load_outputs();
@@ -40,7 +40,7 @@ auto Package::load_from_file(const std::string& path, bool instantiate) -> void
 	}
 
 	for (auto& graph : graphs_container) {
-		graphs_map.try_emplace(graph.url, graph);
+		graphs_map.try_emplace(graph.package_url, graph);
 	}
 
 }

@@ -47,6 +47,32 @@ PYBIND11_MODULE(pysbsar, m)
 	  .value("INTEGER", sbsar::DataType::INTEGER)
 	  .value("FLOAT", sbsar::DataType::FLOAT);
 
+	py::enum_<sbsar::OutputSize>(m, "OutputSize")
+	  .value("x1", sbsar::OutputSize::x1)
+	  .value("x2", sbsar::OutputSize::x2)
+	  .value("x4", sbsar::OutputSize::x4)
+	  .value("x8", sbsar::OutputSize::x8)
+	  .value("x16", sbsar::OutputSize::x16)
+	  .value("x32", sbsar::OutputSize::x32)
+	  .value("x64", sbsar::OutputSize::x64)
+	  .value("x128", sbsar::OutputSize::x128)
+	  .value("x256", sbsar::OutputSize::x256)
+	  .value("x512", sbsar::OutputSize::x512)
+	  .value("x1024", sbsar::OutputSize::x1024)
+	  .value("x2048", sbsar::OutputSize::x2048)
+	  .value("x4096", sbsar::OutputSize::x4096)
+	  .value("x8192", sbsar::OutputSize::x8192)
+	  .value("NONE", sbsar::OutputSize::NONE);
+
+	py::class_<sbsar::OutputFormatOverride>(m, "OutputFormatOverride")
+	  .def_readwrite("format", &sbsar::OutputFormatOverride::format)
+	  .def_readwrite("resolution", &sbsar::OutputFormatOverride::resolution);
+
+	py::class_<sbsar::OutputResolution>(m, "OutputResolution")
+	  .def_readwrite("width", &sbsar::OutputResolution::width)
+	  .def_readwrite("height", &sbsar::OutputResolution::height);
+
+
 	py::class_<sbsar::PixelFormat>(m, "PixelFormat")
 	  .def_readwrite("depth", &sbsar::PixelFormat::precision)
 	  .def_readwrite("format", &sbsar::PixelFormat::format)
@@ -96,25 +122,27 @@ PYBIND11_MODULE(pysbsar, m)
 	  .def("__repr__", [](const sbs::Vec4Float& v) { return fmt::format("{}", v); });
 
 	auto parm_class = py::class_<sbsar::Parameter>(m, "Parameter")
-	  .def("type", &sbsar::Parameter::type)
-	  .def("label", &sbsar::Parameter::label)
-	  .def("description", &sbsar::Parameter::description)
-	  .def("group", &sbsar::Parameter::group)
-	  .def("usages", &sbsar::Parameter::usages)
-	  .def("visible_condition", &sbsar::Parameter::visible_condition)
-	  .def("widget", &sbsar::Parameter::widget)
-	  .def("user_tag", &sbsar::Parameter::user_tag)
-	  .def("component_labels", &sbsar::Parameter::component_labels)
-	  .def("is_visible", &sbsar::Parameter::is_visible)
-	  .def("slider_step", &sbsar::Parameter::slider_step)
-	  .def("slider_clamp", &sbsar::Parameter::slider_clamp)
-	  .def("label_true", &sbsar::Parameter::label_true)
-	  .def("label_false", &sbsar::Parameter::label_false)
-	  .def("get", &sbsar::Parameter::get)
-	  .def("default_value", &sbsar::Parameter::default_value)
-	  .def("max_value", &sbsar::Parameter::max_value)
-	  .def("min_value", &sbsar::Parameter::min_value)
-	  .def("choices", &sbsar::Parameter::choices)
+	  .def_property_readonly("type", &sbsar::Parameter::type)
+	  .def_property_readonly("id", &sbsar::Parameter::id)
+	  .def_property_readonly("label", &sbsar::Parameter::label)
+	  .def_property_readonly("description", &sbsar::Parameter::description)
+	  .def_property_readonly("group", &sbsar::Parameter::group)
+	  .def_property_readonly("usages", &sbsar::Parameter::usages)
+	  .def_property_readonly("visible_condition", &sbsar::Parameter::visible_condition)
+	  .def_property_readonly("widget", &sbsar::Parameter::widget)
+	  .def_property_readonly("user_tag", &sbsar::Parameter::user_tag)
+	  .def_property_readonly("component_labels", &sbsar::Parameter::component_labels)
+	  .def_property_readonly("is_visible", &sbsar::Parameter::is_visible)
+	  .def_property_readonly("visible_condition", &sbsar::Parameter::visible_condition)
+	  .def_property_readonly("slider_step", &sbsar::Parameter::slider_step)
+	  .def_property_readonly("slider_clamp", &sbsar::Parameter::slider_clamp)
+	  .def_property_readonly("label_true", &sbsar::Parameter::label_true)
+	  .def_property_readonly("label_false", &sbsar::Parameter::label_false)
+	  .def_property("value", &sbsar::Parameter::get, &sbsar::Parameter::set<sbsar::Value>)
+	  .def_property_readonly("default_value", &sbsar::Parameter::default_value)
+	  .def_property_readonly("max_value", &sbsar::Parameter::max_value)
+	  .def_property_readonly("min_value", &sbsar::Parameter::min_value)
+	  .def_property_readonly("choices", &sbsar::Parameter::choices)
 	  .def("set", &sbsar::Parameter::set<std::string>, "value"_a);
 
 	hana::for_each(sbsar::meta::sbs_parm_types, [&](auto& t) {
@@ -126,6 +154,11 @@ PYBIND11_MODULE(pysbsar, m)
 	py::class_<sbsar::Output>(m, "Output", py::buffer_protocol())
 	  .def("save", &sbsar::Output::save, "filename"_a)
 	  .def_readonly("format", &sbsar::Output::format)
+	  .def_property_readonly("id", &sbsar::Output::id)
+	  .def_property_readonly("label", &sbsar::Output::label)
+	  .def_property_readonly("group", &sbsar::Output::group)
+	  .def_property_readonly("usages", &sbsar::Output::usages)
+	  .def_property_readonly("visible_condition", &sbsar::Output::visible_condition)
 	  .def_buffer([](sbsar::Output& output) -> py::buffer_info {
 
 		  auto info = py::buffer_info{};
@@ -180,6 +213,14 @@ PYBIND11_MODULE(pysbsar, m)
 	  });
 
 	py::class_<sbsar::Input>(m, "Input", py::buffer_protocol())
+	  .def_property_readonly("id", &sbsar::Input::id)
+	  .def_property_readonly("label", &sbsar::Input::label)
+	  .def_property_readonly("description", &sbsar::Input::description)
+	  .def_property_readonly("visible_condition", &sbsar::Input::visible_condition)
+	  .def_property_readonly("is_visible", &sbsar::Input::is_visible)
+	  .def_property_readonly("is_color", &sbsar::Input::is_color)
+	  .def_property_readonly("is_floating_point", &sbsar::Input::is_floating_point)
+	  .def_property_readonly("usages", &sbsar::Input::usages)
 	  .def("load_from_file", &sbsar::Input::load_from_file, "filename"_a)
 	  .def("load_from_array", [](sbsar::Input& input, py::buffer& buffer) -> void {
 		  auto info = buffer.request();
@@ -223,7 +264,7 @@ PYBIND11_MODULE(pysbsar, m)
 		  }
 
 		  input.load_from_buffer(info.ptr, static_cast<int>(shape[0]), static_cast<int>(shape[1]), format);
-	  });
+	  }, "data"_a);
 
 	py::class_<sbsar::Graph>(m, "Graph")
 	  .def("render", &sbsar::Graph::render, "grab_results"_a = true)

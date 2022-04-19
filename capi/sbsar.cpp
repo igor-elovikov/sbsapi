@@ -81,12 +81,47 @@ SBSAPI_EXPORT auto package_graphs(Package* package, Graph** graphs) -> void
 // Graph
 SBSAPI_EXPORT auto graph_url(Graph* graph) -> StringHandle
 {
-	return string_handle(graph->url);
+	return string_handle(graph->url());
 }
 
 SBSAPI_EXPORT auto graph_label(Graph* graph) -> StringHandle
 {
 	return string_handle(graph->descriptor()->mLabel);
+}
+
+SBSAPI_EXPORT auto graph_description(Graph* graph) -> StringHandle
+{
+	return string_handle(graph->descriptor()->mDescription);
+}
+
+SBSAPI_EXPORT auto graph_category(Graph* graph) -> StringHandle
+{
+	return string_handle(graph->descriptor()->mCategory);
+}
+
+SBSAPI_EXPORT auto graph_keywords(Graph* graph) -> StringHandle
+{
+	return string_handle(graph->descriptor()->mKeywords);
+}
+
+SBSAPI_EXPORT auto graph_author(Graph* graph) -> StringHandle
+{
+	return string_handle(graph->descriptor()->mAuthor);
+}
+
+SBSAPI_EXPORT auto graph_author_url(Graph* graph) -> StringHandle
+{
+	return string_handle(graph->descriptor()->mAuthorUrl);
+}
+
+SBSAPI_EXPORT auto graph_user_tag(Graph* graph) -> StringHandle
+{
+	return string_handle(graph->descriptor()->mUserTag);
+}
+
+SBSAPI_EXPORT auto graph_type(Graph* graph) -> StringHandle
+{
+	return string_handle(graph->descriptor()->mTypeStr);
 }
 
 SBSAPI_EXPORT auto graph_render(Graph* graph, int grab_results) -> void
@@ -241,7 +276,6 @@ SBSAPI_EXPORT auto parm_id(Parameter* parm) -> StringHandle
 {
 	return string_handle(parm->descriptor()->mIdentifier);
 }
-
 
 SBSAPI_EXPORT auto parm_label(Parameter* parm) -> StringHandle
 {
@@ -430,6 +464,28 @@ SBSAPI_EXPORT auto output_label(Output* output) -> StringHandle
 	return string_handle(output->descriptor()->mLabel);
 }
 
+SBSAPI_EXPORT auto output_group(Output* output) -> StringHandle
+{
+	return string_handle(output->descriptor()->mGroup);
+}
+
+SBSAPI_EXPORT auto output_visible_condition(Output* output) -> StringHandle
+{
+	return string_handle(output->descriptor()->mGuiVisibleIf);
+}
+
+SBSAPI_EXPORT auto output_num_usages(Output* output) -> uint32_t
+{
+	return output->descriptor()->mChannelsStr.size();
+}
+
+SBSAPI_EXPORT auto output_usages(Output* output, StringHandle* usages) -> void
+{
+	for (auto&& [index, usage] : output->descriptor()->mChannelsStr | vi::enumerate) {
+		usages[index] = string_handle(usage);
+	}
+}
+
 SBSAPI_EXPORT auto output_data(Output* output) -> void*
 {
 	return output->get_raw_data();
@@ -439,7 +495,6 @@ SBSAPI_EXPORT auto output_save(Output* output, const char* filename) -> void
 {
 	output->save(filename);
 }
-
 
 SBSAPI_EXPORT auto output_format(Output* output, PixelFormat* format) -> void
 {
@@ -482,6 +537,28 @@ SBSAPI_EXPORT auto input_id(Input* input) -> StringHandle
 SBSAPI_EXPORT auto input_label(Input* input) -> StringHandle
 {
 	return string_handle(input->descriptor()->mLabel);
+}
+
+SBSAPI_EXPORT auto input_visible_condition(Input* input) -> StringHandle
+{
+	return string_handle(input->descriptor()->mGuiVisibleIf);
+}
+
+SBSAPI_EXPORT auto input_is_visible(Input* input) -> int
+{
+	return input->is_visible();
+}
+
+SBSAPI_EXPORT auto input_num_usages(Input* input) -> uint32_t
+{
+	return input->descriptor()->mChannelsStr.size();
+}
+
+SBSAPI_EXPORT auto input_usages(Input* input, StringHandle* usages) -> void
+{
+	for (auto&& [index, usage] : input->descriptor()->mChannelsStr | vi::enumerate) {
+		usages[index] = string_handle(usage);
+	}
 }
 
 SBSAPI_EXPORT auto
