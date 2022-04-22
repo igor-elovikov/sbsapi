@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.h"
 #include <substance/framework/visibleif.h>
 
 namespace sbsar {

@@ -1,13 +1,19 @@
 #include "utils/common.h"
 #include "sbsar/Context.h"
-#include "capi/sbsar.cpp"
 
-const auto sbsar_path = "D:/graph.sbsar";
-
+const auto sbsar_path = "C:/Users/elovikov/OneDrive/sbs/Unity/ring.sbsar";
 
 
 int main()
 {
 	spdlog::set_level(spdlog::level::debug);
+
+	auto ctx = sbsar::Context();
+	auto& pkg = ctx.load_package(sbsar_path);
+
+	auto& graph = pkg.graph("ring");
+	auto& parm = graph.parm("Radius");
+	spdlog::info("max value: {}", parm.max_value_as<float>());
+
 	return 0;
 }

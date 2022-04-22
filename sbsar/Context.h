@@ -9,17 +9,42 @@ class Context {
 
 public:
 
-	sbs::Renderer renderer;
+	std::unique_ptr<sbs::Renderer> renderer;
 	std::unordered_map<std::string, Package> packages;
 
-	Context()
+	explicit Context(bool enable_renderer = true)
 	{
 		spdlog::info("Start SBS context");
+		if (enable_renderer) {
+			renderer = std::make_unique<sbs::Renderer>();
+		}
+
+	}
+
+	explicit Context(size_t memory_budget_mbytes)
+	{
+		auto options = sbs::RenderOptions();
+		options.mMemoryBudget = memory_budget_mbytes * 1024 * 1024;
+		spdlog::info("Start SBS context");
+		renderer = std::make_unique<sbs::Renderer>(options);
+	}
+
+	explicit Context(const sbs::RenderOptions& options)
+	{
+		spdlog::info("Start SBS context");
+		renderer = std::make_unique<sbs::Renderer>(options);
 	}
 
 	~Context()
 	{
 		spdlog::info("Shutdown SBS context");
+	}
+
+	auto set_renderer_options(const sbs::RenderOptions& options) const -> void
+	{
+		if (!renderer) return;
+		renderer->setOptions(options);
+		renderer->run();
 	}
 
 	auto load_package(const std::string& filename, bool instantiate = true) -> Package&

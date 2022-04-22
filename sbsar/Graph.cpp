@@ -109,9 +109,14 @@ auto Graph::load_inputs() -> void
 
 auto Graph::render(bool grab_results) -> void
 {
+	if (!ctx->renderer) {
+		spdlog::debug("Rendering graph [{}] cancelled: renderer is not enabled in context", package_url);
+		return;
+	}
+
 	spdlog::debug("Rendering graph [{}]", package_url);
-	ctx->renderer.push(*instance);
-	ctx->renderer.run();
+	ctx->renderer->push(*instance);
+	ctx->renderer->run();
 	spdlog::debug("Done rendering");
 
 	if (grab_results) {

@@ -62,7 +62,7 @@ struct SbsInput {
 	static auto apply_value(instance_type instance, const T& value) { instance->setValue(value); }
 
 	static auto get_default_value(descriptor_type desc) { return desc->mDefaultValue; }
-	static auto get_max_value(descriptor_type desc) { return desc->mMinValue; }
+	static auto get_max_value(descriptor_type desc) { return desc->mMaxValue; }
 	static auto get_min_value(descriptor_type desc) { return desc->mMinValue; }
 	static auto get_slider_step(descriptor_type desc) { return desc->mSliderStep; }
 	static auto get_slider_clamp(descriptor_type desc) { return desc->mSliderClamp; }
