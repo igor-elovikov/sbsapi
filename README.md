@@ -127,7 +127,8 @@ from skimage import data
 
 ...
 
-graph.input("input").load_from_array(data.astronaut())
+# the same with inputs
+graph.input("input").load_from_array(data.astronaut()) # you can upload numpy array to any input
 graph.render()
 graph.output("output").save("output.png")
 ```
