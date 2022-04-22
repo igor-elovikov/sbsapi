@@ -280,7 +280,8 @@ PYBIND11_MODULE(pysbsar, m)
 	  .def("graphs", &sbsar::Package::graphs, py::return_value_policy::reference);
 
 	py::class_<sbsar::Context>(m, "Context")
-	  .def(py::init<>())
+	  .def(py::init<bool>(), "enable_renderer"_a = true)
+	  .def(py::init<size_t>(), "memory_budget_mbytes"_a)
 	  .def("load_package", &sbsar::Context::load_package, "filename"_a, "instantiate"_a = true,
 		py::return_value_policy::reference);
 

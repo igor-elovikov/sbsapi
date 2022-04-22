@@ -25,7 +25,7 @@ public:
 	{
 		auto options = sbs::RenderOptions();
 		options.mMemoryBudget = memory_budget_mbytes * 1024 * 1024;
-		spdlog::info("Start SBS context");
+		spdlog::info("Start SBS context with {}MB memory budget", memory_budget_mbytes);
 		renderer = std::make_unique<sbs::Renderer>(options);
 	}
 
