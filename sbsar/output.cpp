@@ -1,4 +1,4 @@
-#include "Output.h"
+#include "output.h"
 
 namespace sbsar {
 

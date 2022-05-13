@@ -1,6 +1,6 @@
 #include "common.h"
-#include "Input.h"
-#include "Image.h"
+#include "input.h"
+#include "image.h"
 
 namespace sbsar {
 

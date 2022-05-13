@@ -2,7 +2,8 @@
 // Created by elovikov on 30/03/2022.
 //
 
-#include "Package.h"
+#include "package.h"
+#include "context.h"
 
 namespace sbsar {
 
@@ -13,12 +14,12 @@ auto Package::load_from_file(const std::string& path, bool instantiate) -> void
 	load_file(file_data, path, true);
 
 	descriptor = std::make_unique<sbs::PackageDesc>(file_data.data(), file_data.size());
-	spdlog::debug("Loaded package from {}", path);
+	ctx->logger->debug("Loaded package from {}", path);
 
 	const auto& pkg_graphs = descriptor->getGraphs();
 
 	for (const auto& pkg_graph : descriptor->getGraphs()) {
-		spdlog::debug("Loading graph: {}", pkg_graph.mPackageUrl);
+		ctx->logger->debug("Loading graph: {}", pkg_graph.mPackageUrl);
 
 		auto graph_url = std::string(pkg_graph.mPackageUrl);
 
@@ -43,6 +44,15 @@ auto Package::load_from_file(const std::string& path, bool instantiate) -> void
 		graphs_map.try_emplace(graph.package_url, graph);
 	}
 
+}
+
+Package::~Package()
+{
+	graphs_map.clear();
+	graphs_container.clear();
+	instances.clear();
+
+	ctx->logger->debug("Unload package {}", url);
 }
 
 }

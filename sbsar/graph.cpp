@@ -1,5 +1,5 @@
-#include "Graph.h"
-#include "Context.h"
+#include "graph.h"
+#include "context.h"
 
 namespace sbsar {
 
@@ -18,7 +18,7 @@ auto Graph::link_instance() -> void
 				parms_map.at(id).instance = input;
 			}
 			else {
-				spdlog::warn("Couldn't find descriptor for parameter [{}]", id);
+				ctx->logger->warn("Couldn't find descriptor for parameter [{}]", id);
 			}
 		}
 		else if (input->mDesc.isImage()) {
@@ -26,7 +26,7 @@ auto Graph::link_instance() -> void
 				inputs_map.at(id).instance = dynamic_cast<sbs::InputInstanceImage*>(input);
 			}
 			else {
-				spdlog::warn("Couldn't find descriptor for input [{}]", id);
+				ctx->logger->warn("Couldn't find descriptor for input [{}]", id);
 			}
 		}
 	}
@@ -40,7 +40,7 @@ auto Graph::link_instance() -> void
 			outputs_map.at(id).instance = instance_output;
 		}
 		else {
-			spdlog::warn("Couldn't find output descriptor for {}", instance_output->mDesc.mIdentifier);
+			ctx->logger->warn("Couldn't find output descriptor for {}", instance_output->mDesc.mIdentifier);
 		}
 	}
 }
@@ -78,6 +78,7 @@ auto Graph::load_parameters() -> void
 		if (input->isImage()) continue;
 		auto id = std::string(input->mIdentifier);
 		auto& parm = parms_container.emplace_back(input);
+		parm.logger = ctx->logger.get();
 	}
 
 	for (auto& input : parms_container) {
@@ -110,14 +111,14 @@ auto Graph::load_inputs() -> void
 auto Graph::render(bool grab_results) -> void
 {
 	if (!ctx->renderer) {
-		spdlog::debug("Rendering graph [{}] cancelled: renderer is not enabled in context", package_url);
+		ctx->logger->debug("Rendering graph [{}] cancelled: renderer is not enabled in context", package_url);
 		return;
 	}
 
-	spdlog::debug("Rendering graph [{}]", package_url);
+	ctx->logger->debug("Rendering graph [{}]", package_url);
 	ctx->renderer->push(*instance);
 	ctx->renderer->run();
-	spdlog::debug("Done rendering");
+	ctx->logger->debug("Done rendering");
 
 	if (grab_results) {
 		rn::for_each(outputs_map | vi::values, &Output::grab_result);

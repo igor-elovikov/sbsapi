@@ -1,9 +1,9 @@
 #pragma once
 
 #include "common.h"
-#include "Parameter.h"
-#include "Output.h"
-#include "Input.h"
+#include "parameter.h"
+#include "output.h"
+#include "input.h"
 
 namespace sbsar {
 

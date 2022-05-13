@@ -1,4 +1,4 @@
-#include "Image.h"
+#include "image.h"
 
 #include <OpenImageIO/imageio.h>
 namespace oiio = OIIO;

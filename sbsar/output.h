@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.h"
-#include "Image.h"
+#include "image.h"
 
 namespace sbsar {
 

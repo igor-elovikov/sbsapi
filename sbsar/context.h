@@ -1,43 +1,52 @@
 #pragma once
 
 #include "common.h"
-#include "Package.h"
+#include "package.h"
+
+#include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace sbsar {
 
 class Context {
 
+	auto init_logging() -> void
+	{
+		logger = spdlog::stdout_color_mt("sbsar");
+	}
+
 public:
+
+	std::shared_ptr<spdlog::logger> logger;
 
 	std::unique_ptr<sbs::Renderer> renderer;
 	std::unordered_map<std::string, Package> packages;
 
 	explicit Context(bool enable_renderer = true)
 	{
-		spdlog::info("Start SBS context");
+		init_logging();
 		if (enable_renderer) {
 			renderer = std::make_unique<sbs::Renderer>();
 		}
-
 	}
 
 	explicit Context(size_t memory_budget_mbytes)
 	{
+		init_logging();
 		auto options = sbs::RenderOptions();
 		options.mMemoryBudget = memory_budget_mbytes * 1024 * 1024;
-		spdlog::info("Start SBS context with {}MB memory budget", memory_budget_mbytes);
 		renderer = std::make_unique<sbs::Renderer>(options);
 	}
 
 	explicit Context(const sbs::RenderOptions& options)
 	{
-		spdlog::info("Start SBS context");
+		init_logging();
 		renderer = std::make_unique<sbs::Renderer>(options);
 	}
 
 	~Context()
 	{
-		spdlog::info("Shutdown SBS context");
+		logger->info("Shutdown SBS context");
+		logger->flush();
 	}
 
 	auto set_renderer_options(const sbs::RenderOptions& options) const -> void

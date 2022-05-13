@@ -9,6 +9,7 @@ namespace sbsar {
 class Parameter {
 
 	friend class Graph;
+	spdlog::logger* logger = nullptr;
 
 	const sbs::InputDescBase* sbs_descriptor = nullptr;
 	sbs::InputInstanceBase* instance = nullptr;
@@ -208,7 +209,6 @@ public:
 
 	auto choices() -> std::vector<std::pair<Value, std::string>>
 	{
-		using variant_choices = std::vector<std::pair<Value, std::string>>;
 		auto result = std::vector<std::pair<Value, std::string>>{};
 		if (sbs_descriptor->isNumerical()) {
 			hana::for_each(meta::sbs_parm_types, [&](auto& t) {
@@ -235,6 +235,7 @@ public:
 			return meta::SbsInput<T>::get_value(instance_pointer);
 		}
 		else {
+			logger->warn("Wrong type with getting parameter [{}]", sbs_descriptor->mIdentifier);
 			return default_value_as<T>();
 		}
 	}
@@ -259,7 +260,13 @@ public:
 		if (!instance) return;
 
 		auto instance_pointer = instance_for<T>();
-		if (!instance_pointer) return;
+		if (!instance_pointer)
+		{
+			logger->warn("Wrong type with setting parameter [{}] with value: {}",
+			  sbs_descriptor->mIdentifier,
+			  v);
+			return;
+		}
 
 		meta::SbsInput<T>::apply_value(instance_pointer, v);
 	}
@@ -267,13 +274,19 @@ public:
 	template <>
 	auto set(const Value& v) -> void
 	{
+		auto value_was_set = false;
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 			auto builtin_type = meta::get_builtin_type(t);
 			using builtin_t = typename decltype(builtin_type)::type;
 			if (std::holds_alternative<builtin_t>(v)) {
 				set<builtin_t>(std::get<builtin_t>(v));
+				value_was_set = true;
 			}
 		});
+
+		if (!value_was_set) {
+			logger->warn("Wrong type with setting parameter [{}]", sbs_descriptor->mIdentifier);
+		}
 	}
 
 	auto set(const char* v) -> void { set(sbs::string(v)); }

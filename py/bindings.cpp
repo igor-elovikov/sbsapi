@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include "sbsar/Context.h"
-#include "sbsar/Package.h"
+#include "sbsar/context.h"
+#include "sbsar/package.h"
 
 namespace py = pybind11;
 
@@ -146,7 +146,7 @@ PYBIND11_MODULE(pysbsar, m)
 	  .def("set", &sbsar::Parameter::set<std::string>, "value"_a);
 
 	hana::for_each(sbsar::meta::sbs_parm_types, [&](auto& t) {
-		auto builtin_type = sbsar::meta::get_builtin_type(t);
+		[[maybe_unused]] auto builtin_type = sbsar::meta::get_builtin_type(t);
 		using builtin_t = typename decltype(builtin_type)::type;
 		parm_class.def("set", &sbsar::Parameter::set<builtin_t>, "value"_a);
 	});

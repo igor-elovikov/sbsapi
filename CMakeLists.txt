@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.21)
 project(sbsar)
 
 set(CMAKE_CXX_STANDARD 20)
-set(SBS_SDK_PATH D:/dev/sbssdk)
-#set(SAIL_COMBINE_CODECS ON)
 
 find_package(Boost REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
@@ -12,13 +10,11 @@ find_package(utf8cpp CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 find_package(OpenImageIO CONFIG REQUIRED)
 
-#find_package(SailC++ CONFIG REQUIRED)
-
 add_subdirectory(external/tinyxml)
 add_subdirectory(external/pybind11) # ? vcpkg package is screwed
 
-add_library(sbsarlib STATIC sbsar/Graph.cpp sbsar/Package.cpp sbsar/Parameter.cpp sbsar/Context.cpp sbsar/Context.h
-        sbsar/Output.cpp sbsar/Output.h sbsar/types.h sbsar/Image.cpp sbsar/Image.h sbsar/Input.cpp sbsar/Input.h
+add_library(sbsarlib STATIC sbsar/graph.cpp sbsar/package.cpp sbsar/context.h
+        sbsar/output.cpp sbsar/output.h sbsar/types.h sbsar/image.cpp sbsar/image.h sbsar/input.cpp sbsar/input.h
         )
 
 target_compile_options(sbsarlib PUBLIC "/Zc:__cplusplus")
@@ -31,14 +27,13 @@ target_link_libraries(sbsarlib
         utf8cpp
         spdlog::spdlog_header_only
         OpenImageIO::OpenImageIO
-        #SAIL::sail-c++
         )
 
 # main library
 target_include_directories(sbsarlib PUBLIC
         ./
         utils
-        "${SBS_SDK_PATH}/include")
+        "$ENV{SBS_SDK_PATH}/include")
 
 # sbsar C API
 add_library(sbsapi SHARED capi/sbsar.cpp)

@@ -1,5 +1,5 @@
 #include "utils/common.h"
-#include "sbsar/Context.h"
+#include "sbsar/context.h"
 
 const auto sbsar_path = "C:/Users/elovikov/OneDrive/sbs/Unity/ring.sbsar";
 
@@ -14,6 +14,8 @@ int main()
 	auto& graph = pkg.graph("ring");
 	auto& parm = graph.parm("Radius");
 	spdlog::info("max value: {}", parm.max_value_as<float>());
+	parm.set(10);
+
 
 	return 0;
 }

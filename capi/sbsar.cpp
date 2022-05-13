@@ -1,7 +1,7 @@
 #include "sbsapi_export.h"
 #include "common.h"
-#include "sbsar/Package.h"
-#include "sbsar/Context.h"
+#include "sbsar/package.h"
+#include "sbsar/context.h"
 
 namespace sbsar::capi {
 

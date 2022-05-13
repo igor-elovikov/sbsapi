@@ -1,13 +1,9 @@
 #pragma once
 
 #include "common.h"
-
-#include "Graph.h"
-
+#include "graph.h"
 
 namespace sbsar {
-
-class Context;
 
 class Package {
 
@@ -26,14 +22,8 @@ public:
 	sbs::GraphInstances instances;
 
 	Package() = default;
-	~Package()
-	{
-		graphs_map.clear();
-		graphs_container.clear();
-		instances.clear();
+	~Package();
 
-		spdlog::debug("Unload package {}", url);
-	}
 	explicit Package(const std::string& path, Context* context, bool instantiate)
 	{
 		ctx = context;
