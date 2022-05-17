@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.21)
 project(sbsar)
 
 set(CMAKE_CXX_STANDARD 20)
-set(PYBIND11_PYTHON_VERSION 3.7)
 
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
 find_package(Boost REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(utf8cpp CONFIG REQUIRED)
@@ -12,31 +12,34 @@ find_package(range-v3 CONFIG REQUIRED)
 find_package(OpenImageIO CONFIG REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 find_package(PNG REQUIRED)
-
-add_subdirectory(external/tinyxml)
-#add_subdirectory(external/pybind11) # ? vcpkg package is screwed
+find_package(tinyxml CONFIG REQUIRED)
 
 add_library(sbsarlib STATIC sbsar/graph.cpp sbsar/package.cpp sbsar/context.h
         sbsar/output.cpp sbsar/output.h sbsar/types.h sbsar/image.cpp sbsar/image.h sbsar/input.cpp sbsar/input.h
         )
 
 if (WIN32)
-target_compile_options(sbsarlib PUBLIC "/Zc:__cplusplus")
-endif(WIN32)
+    target_compile_options(sbsarlib PUBLIC "/Zc:__cplusplus")
 
-if (WIN32)
-set (SBS_ENGINE $ENV{SBS_SDK_PATH}/lib/win32-msvc2019-64/debug_md/substance_d3d10pc_blend.lib)
-set (SBS_LINKER $ENV{SBS_SDK_PATH}/lib/win32-msvc2019-64/debug_md/substance_linker.lib)
-set (SBS_FRAMEWORK $ENV{SBS_SDK_PATH}/lib/win32-msvc2019-64/debug_md/substance_framework.lib)
-endif(WIN32)
+    target_link_directories(sbsarlib PUBLIC
+            $ENV{SBS_SDK_PATH}/lib/win32-msvc2019-64/debug_md
+            $ENV{SBS_SDK_PATH}/bin/win32-msvc2019-64/debug_md
+            )
 
-target_link_directories(sbsarlib PUBLIC
-        $ENV{SBS_SDK_PATH}/lib/macx-clang-64/release/
-        $ENV{SBS_SDK_PATH}/bin/macx-clang-64/release
-        )
+    set(SBS_ENGINE_LIB substance_d3d11pc_blend)
+endif (WIN32)
+
+if (UNIX)
+    target_link_directories(sbsarlib PUBLIC
+            $ENV{SBS_SDK_PATH}/lib/macx-clang-64/release
+            $ENV{SBS_SDK_PATH}/bin/macx-clang-64/release
+            )
+
+    set(SBS_ENGINE_LIB substance_ogl3_blend)
+endif (UNIX)
 
 target_link_libraries(sbsarlib
-        substance_ogl3_blend
+        ${SBS_ENGINE_LIB}
         substance_linker
         substance_framework
         tinyxml
