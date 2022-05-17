@@ -4,7 +4,15 @@ project(sbsar)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(CUSTOM_PYTHON_DIR C:/python/python37) # need to reset cache...
+
+if (DEFINED CUSTOM_PYTHON_DIR)
+    set(Python_EXECUTABLE ${CUSTOM_PYTHON_DIR}/python.exe)
+    set(Python_INCLUDE_DIR ${CUSTOM_PYTHON_DIR}/include)
+endif (DEFINED CUSTOM_PYTHON_DIR)
+
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
+
 find_package(Boost REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(utf8cpp CONFIG REQUIRED)
@@ -22,8 +30,8 @@ if (WIN32)
     target_compile_options(sbsarlib PUBLIC "/Zc:__cplusplus")
 
     target_link_directories(sbsarlib PUBLIC
-            $ENV{SBS_SDK_PATH}/lib/win32-msvc2019-64/debug_md
-            $ENV{SBS_SDK_PATH}/bin/win32-msvc2019-64/debug_md
+            $<$<CONFIG:Debug>:$ENV{SBS_SDK_PATH}/lib/win32-msvc2019-64/debug_md>
+            $<$<CONFIG:Release>:$ENV{SBS_SDK_PATH}/lib/win32-msvc2019-64/release_md>
             )
 
     set(SBS_ENGINE_LIB substance_d3d11pc_blend)
@@ -34,7 +42,6 @@ if (UNIX)
             $ENV{SBS_SDK_PATH}/lib/macx-clang-64/release
             $ENV{SBS_SDK_PATH}/bin/macx-clang-64/release
             )
-
     set(SBS_ENGINE_LIB substance_ogl3_blend)
 endif (UNIX)
 
@@ -62,13 +69,23 @@ target_include_directories(sbsapi PUBLIC
 target_link_libraries(sbsapi PUBLIC sbsarlib)
 
 # python bindings
+set(PYSBSAR_DIR ${CMAKE_SOURCE_DIR}/pysbsar)
+file(MAKE_DIRECTORY ${PYSBSAR_DIR})
+
 pybind11_add_module(pysbsar py/bindings.cpp)
+
 target_link_libraries(pysbsar PUBLIC sbsarlib)
+if (WIN32 AND MSVC)
+    target_link_libraries(pysbsar PUBLIC ${Python_LIBRARY_RELEASE})
+endif (WIN32 AND MSVC)
+
+
 set_target_properties(pysbsar
         PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY /Users/elovikov/work/python/pysbsar
-        RUNTIME_OUTPUT_DIRECTORY /Users/elovikov/work/python/pysbsar
+        LIBRARY_OUTPUT_DIRECTORY ${PYSBSAR_DIR}
+        RUNTIME_OUTPUT_DIRECTORY ${PYSBSAR_DIR}
         )
+
 
 # test executable
 add_executable(main main.cpp)
