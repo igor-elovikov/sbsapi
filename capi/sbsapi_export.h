@@ -2,6 +2,8 @@
 #ifndef SBSAPI_EXPORT_H
 #define SBSAPI_EXPORT_H
 
+#ifdef _WIN32
+
 #ifdef SBSAPI_STATIC_DEFINE
 #  define SBSAPI_EXPORT
 #  define SBSAPI_NO_EXPORT
@@ -37,6 +39,12 @@
 #  ifndef SBSAPI_NO_DEPRECATED
 #    define SBSAPI_NO_DEPRECATED
 #  endif
+#endif
+
+#else
+
+#define SBSAPI_EXPORT
+
 #endif
 
 #endif /* SBSAPI_EXPORT_H */
