@@ -4,7 +4,7 @@ project(sbsar)
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(CUSTOM_PYTHON_DIR C:/python/python37) # need to reset cache...
+#set(CUSTOM_PYTHON_DIR C:/python/python39) # need to reset cache...
 
 if (DEFINED CUSTOM_PYTHON_DIR)
     set(Python_EXECUTABLE ${CUSTOM_PYTHON_DIR}/python.exe)

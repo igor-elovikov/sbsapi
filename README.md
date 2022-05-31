@@ -1,5 +1,5 @@
 # Substance Designer API
-Relatively thin wrapper around Substance SDK
+Relatively thin wrapper around Substance Material SDK
 
 **Early WIP**
 
@@ -17,7 +17,27 @@ Things to do:
 * Support for package stack
 * Parameters visibility should be cached (or be a user responsibility)
 * Examples
+* vcpkg manifest
 * C#?
+
+### Dependencies
+
+All dependencies can be installed from vcpkg (including third-party coming with the SDK)
+* boost::hana
+* spdlog
+* range-v3
+* pybind11
+* OpenImageIO
+* utf8cpp
+* tinyxml
+
+### Build
+
+You need an environment variable `SBS_SDK_PATH` pointing to Substance Material SDK directory.
+
+Currently, for Win32 `d3d11pc_blend` is used and for OSX it's `ogl3_blend` (can be configured in CMakeLists)
+
+To use custom python installation for bindings uncomment defining `CUTOM_PYTHON_DIR` in CMakeLists and set it accordingly.
 
 ### C++
 ```c++
