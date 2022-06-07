@@ -65,8 +65,7 @@ public:
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = meta::get_builtin_type(t);
-				using builtin_t = typename decltype(builtin_type)::type;
+				using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;
 				auto desc_pointer = descriptor_for<builtin_t>();
 				result = meta::SbsInput<builtin_t>::get_slider_step(desc_pointer);
 			}
@@ -80,8 +79,7 @@ public:
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = meta::get_builtin_type(t);
-				using builtin_t = typename decltype(builtin_type)::type;
+				using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;
 				auto desc_pointer = descriptor_for<builtin_t>();
 				result = meta::SbsInput<builtin_t>::get_slider_clamp(desc_pointer);
 			}
@@ -95,8 +93,7 @@ public:
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = meta::get_builtin_type(t);
-				using builtin_t = typename decltype(builtin_type)::type;
+				using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;
 				auto desc_pointer = descriptor_for<builtin_t>();
 				result = meta::SbsInput<builtin_t>::get_label_true(desc_pointer);
 			}
@@ -110,8 +107,7 @@ public:
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = meta::get_builtin_type(t);
-				using builtin_t = typename decltype(builtin_type)::type;
+				using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;
 				auto desc_pointer = descriptor_for<builtin_t>();
 				result = meta::SbsInput<builtin_t>::get_label_false(desc_pointer);
 			}
@@ -142,8 +138,7 @@ public:
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = meta::get_builtin_type(t);
-				using builtin_t = typename decltype(builtin_type)::type;
+				using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;
 				result = default_value_as<builtin_t>();
 			}
 		});
@@ -166,8 +161,7 @@ public:
 			hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 				auto io = meta::get_type_io(t);
 				if (io == sbs_descriptor->mType) {
-					auto builtin_type = meta::get_builtin_type(t);
-					using builtin_t = typename decltype(builtin_type)::type;
+					using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;
 					result = max_value_as<builtin_t>();
 				}
 			});
@@ -191,8 +185,7 @@ public:
 			hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 				auto io = meta::get_type_io(t);
 				if (io == sbs_descriptor->mType) {
-					auto builtin_type = meta::get_builtin_type(t);
-					using builtin_t = typename decltype(builtin_type)::type;
+					using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;
 					result = min_value_as<builtin_t>();
 				}
 			});
@@ -212,10 +205,8 @@ public:
 		auto result = std::vector<std::pair<Value, std::string>>{};
 		if (sbs_descriptor->isNumerical()) {
 			hana::for_each(meta::sbs_parm_types, [&](auto& t) {
-				auto io = meta::get_type_io(t);
-				if (io == sbs_descriptor->mType) {
-					auto builtin_type = meta::get_builtin_type(t);
-					using builtin_t = typename decltype(builtin_type)::type;
+				if (meta::get_type_io(t) == sbs_descriptor->mType) {
+					using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;
 					auto choices = choices_as<builtin_t>();
 					for (auto& [v, k] : choices) {
 						result.push_back(std::make_pair(Value(v), k));
@@ -246,8 +237,7 @@ public:
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
 			auto io = meta::get_type_io(t);
 			if (io == sbs_descriptor->mType) {
-				auto builtin_type = meta::get_builtin_type(t);
-				using builtin_t = typename decltype(builtin_type)::type;
+				using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;
 				result = get_as<builtin_t>();
 			}
 		});
@@ -276,8 +266,7 @@ public:
 	{
 		auto value_was_set = false;
 		hana::for_each(meta::sbs_parm_types, [&](auto& t) {
-			auto builtin_type = meta::get_builtin_type(t);
-			using builtin_t = typename decltype(builtin_type)::type;
+			using builtin_t = typename decltype(+meta::get_builtin_type(t))::type;;
 			if (std::holds_alternative<builtin_t>(v)) {
 				set<builtin_t>(std::get<builtin_t>(v));
 				value_was_set = true;

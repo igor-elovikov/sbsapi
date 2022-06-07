@@ -21,11 +21,16 @@ namespace vi = rn::views;
 namespace sbs = SubstanceAir;
 
 template <class Container>
-auto load_file(Container& container, const std::string& path, bool binary)
+auto load_file(Container& container, const std::string& path, bool binary, spdlog::logger* logger = nullptr)
 {
 	std::ifstream is(
 	  path.c_str(),
 	  std::ios::in | (binary ? std::ios::binary : (std::ios::openmode)0));
+	if (!is.is_open()) {
+		auto msg = fmt::format("file [{}] not found!", path);
+		if (logger) logger->error(msg);
+		throw std::runtime_error(msg);
+	}
 	is.seekg(0, std::ios::end);
 	container.resize(is.tellg());
 	is.seekg(0, std::ios::beg);

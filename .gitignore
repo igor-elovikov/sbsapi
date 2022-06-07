@@ -218,3 +218,4 @@ makepackage.py
 .sdpackageignore
 pluginInfo.json
 psd/
+pysbsar/

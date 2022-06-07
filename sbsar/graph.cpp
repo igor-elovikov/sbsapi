@@ -111,7 +111,7 @@ auto Graph::load_inputs() -> void
 auto Graph::render(bool grab_results) -> void
 {
 	if (!ctx->renderer) {
-		ctx->logger->debug("Rendering graph [{}] cancelled: renderer is not enabled in context", package_url);
+		ctx->logger->debug("Rendering graph [{}] cancelled: renderer is not enabled in the context", package_url);
 		return;
 	}
 

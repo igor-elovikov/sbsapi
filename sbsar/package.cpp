@@ -11,9 +11,16 @@ auto Package::load_from_file(const std::string& path, bool instantiate) -> void
 {
 	url = path;
 	auto file_data = std::vector<unsigned char>{};
-	load_file(file_data, path, true);
+	load_file(file_data, path, true, ctx->logger.get());
 
 	descriptor = std::make_unique<sbs::PackageDesc>(file_data.data(), file_data.size());
+
+	if (!descriptor->isValid()) {
+		auto msg = fmt::format("Package [{}] is invalid", path);
+		ctx->logger->error(msg);
+		throw std::runtime_error(msg);
+	}
+
 	ctx->logger->debug("Loaded package from {}", path);
 
 	const auto& pkg_graphs = descriptor->getGraphs();
