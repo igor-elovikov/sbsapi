@@ -1,30 +1,43 @@
-#include "sbsapi_export.h"
-#include "common.h"
-#include "sbsar/package.h"
-#include "sbsar/context.h"
+#include "capi/sbsar.h"
+#include "spdlog/sinks/base_sink.h"
 
 namespace sbsar::capi {
 
 std::unique_ptr<Context> ctx;
 
-struct StringHandle {
-	const char* data;
-	uint64_t size;
+template <typename Mutex>
+class LogSink : public spdlog::sinks::base_sink<Mutex> {
+
+	LogCallback callback = nullptr;
+
+public:
+
+	explicit LogSink(LogCallback log_callback) : callback(log_callback) {}
+
+protected:
+
+	void sink_it_(const spdlog::details::log_msg& msg) override
+	{
+		if (!callback) return;
+		auto formatted = spdlog::memory_buf_t{};
+		spdlog::sinks::base_sink<Mutex>::formatter_->format(msg, formatted);
+		auto message = fmt::to_string(formatted);
+		callback(message.c_str(), message.size());
+	}
+
+	void flush_() override { }
 };
 
-struct ParameterChoice {
-	StringHandle name{};
-	int value{};
-};
+using LogSinkMt = LogSink<std::mutex>;
 
 auto string_handle(const std::string& str) -> StringHandle
 {
-	return StringHandle{str.data(), str.size()};
+	return StringHandle{str.data(), static_cast<uint32_t>(str.size())};
 }
 
 auto string_handle(const sbs::string& str) -> StringHandle
 {
-	return StringHandle{str.data(), str.size()};
+	return StringHandle{str.data(), static_cast<uint32_t>(str.size())};
 }
 
 template <typename T>
@@ -53,6 +66,11 @@ SBSAPI_EXPORT auto init_context() -> void
 SBSAPI_EXPORT auto shutdown() -> void
 {
 	ctx.reset();
+}
+
+SBSAPI_EXPORT auto register_log_callback(LogCallback log_callback) -> void
+{
+	ctx->logger->sinks().push_back(std::make_shared<LogSinkMt>(log_callback));
 }
 
 // Package

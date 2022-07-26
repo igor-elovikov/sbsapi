@@ -9,6 +9,7 @@ namespace sbsar {
 class Output {
 
 	friend class Graph;
+	spdlog::logger* logger = nullptr;
 
 	const sbs::OutputDesc* sbs_descriptor;
 	sbs::OutputInstance* instance = nullptr;

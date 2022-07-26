@@ -7,6 +7,7 @@ namespace sbsar {
 
 class Input {
 	friend class Graph;
+	spdlog::logger* logger = nullptr;
 
 	const sbs::InputDescImage* sbs_descriptor = nullptr;
 	sbs::InputInstanceImage* instance = nullptr;
