@@ -10,7 +10,6 @@ int main()
 	auto ctx = sbsar::Context();
 
 	auto& pkg = ctx.load_package(sbsar_path);
-	auto& pk2 = ctx.packages.at("sbs");
 	auto& graph = pkg.graph("ring");
 	auto& parm = graph.parm("Radius");
 	spdlog::info("max value: {}", parm.max_value_as<float>());

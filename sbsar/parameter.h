@@ -282,7 +282,6 @@ public:
 
 	template <>
 	auto set(const std::string& v) -> void { set(sbs::string(v)); }
-
 };
 
 }

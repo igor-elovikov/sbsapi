@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 
 project(sbsar)
 
+message(STATUS "VC Version: $ENV{VCToolsVersion}")
+
 set(CMAKE_CXX_STANDARD 20)
 
 #set(CUSTOM_PYTHON_DIR C:/python/python39) # need to reset cache...
