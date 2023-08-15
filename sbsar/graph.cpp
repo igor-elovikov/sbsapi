@@ -1,10 +1,11 @@
 #include "graph.h"
 #include "context.h"
 
+#include <range/v3/algorithm/for_each.hpp>
+
 namespace sbsar {
 
-auto Graph::link_instance() -> void
-{
+auto Graph::link_instance() -> void {
 	if (!instance) return;
 	auto& inputs = instance->getInputs();
 
@@ -14,20 +15,16 @@ auto Graph::link_instance() -> void
 		auto id = std::string(input->mDesc.mIdentifier);
 
 		if (input->mDesc.isNumerical()) {
-			if (has_parm(id)) {
+			if (has_parm(id))
 				parms_map.at(id).instance = input;
-			}
-			else {
-				ctx->logger->warn("Couldn't find descriptor for parameter [{}]", id);
-			}
+			else
+				ctx->log_warn("Couldn't find descriptor for parameter [{}]", id);
 		}
 		else if (input->mDesc.isImage()) {
-			if (has_input(id)) {
+			if (has_input(id))
 				inputs_map.at(id).instance = dynamic_cast<sbs::InputInstanceImage*>(input);
-			}
-			else {
-				ctx->logger->warn("Couldn't find descriptor for input [{}]", id);
-			}
+			else
+				ctx->log_warn("Couldn't find descriptor for input [{}]", id);
 		}
 	}
 
@@ -36,17 +33,15 @@ auto Graph::link_instance() -> void
 	for (auto& instance_output : instance_outputs) {
 		if (!instance_output->mDesc.isImage()) continue;
 		auto id = std::string(instance_output->mDesc.mIdentifier);
-		if (has_output(id)) {
+		if (has_output(id))
 			outputs_map.at(id).instance = instance_output;
-		}
-		else {
-			ctx->logger->warn("Couldn't find output descriptor for {}", instance_output->mDesc.mIdentifier);
-		}
+		else
+			ctx->log_warn("Couldn't find output descriptor for {}", instance_output->mDesc.mIdentifier);
+
 	}
 }
 
-auto Graph::load_outputs() -> void
-{
+auto Graph::load_outputs() -> void {
 	if (!sbs_descriptor) return;
 
 	auto& graph_outputs = sbs_descriptor->mOutputs;
@@ -60,13 +55,11 @@ auto Graph::load_outputs() -> void
 		output.set_format_from_descriptor();
 	}
 
-	for (auto& output : outputs_container) {
+	for (auto& output : outputs_container)
 		outputs_map.try_emplace(output.id(), output);
-	}
 }
 
-auto Graph::load_parameters() -> void
-{
+auto Graph::load_parameters() -> void {
 	if (!sbs_descriptor) return;
 
 	auto& inputs = sbs_descriptor->mInputs;
@@ -78,17 +71,14 @@ auto Graph::load_parameters() -> void
 		if (input->isImage()) continue;
 		auto id = std::string(input->mIdentifier);
 		auto& parm = parms_container.emplace_back(input);
-		parm.logger = ctx->logger.get();
+		parm.ctx = ctx;
 	}
 
-	for (auto& input : parms_container) {
+	for (auto& input : parms_container)
 		parms_map.try_emplace(input.id(), input);
-	}
-
 }
 
-auto Graph::load_inputs() -> void
-{
+auto Graph::load_inputs() -> void {
 	if (!sbs_descriptor) return;
 
 	auto& graph_inputs = sbs_descriptor->mInputs;
@@ -99,38 +89,38 @@ auto Graph::load_inputs() -> void
 	for (const auto& graph_input : graph_inputs) {
 		if (!graph_input->isImage()) continue;
 		auto id = std::string(graph_input->mIdentifier);
-		auto& input = inputs_container.emplace_back(dynamic_cast<const sbs::InputDescImage*>(graph_input));
+		inputs_container.emplace_back(dynamic_cast<const sbs::InputDescImage*>(graph_input));
 	}
 
-	for (auto& input : inputs_container) {
+	for (auto& input : inputs_container)
 		inputs_map.try_emplace(input.id(), input);
-	}
-
 }
 
-auto Graph::render(bool grab_results) -> void
-{
-	if (!ctx->renderer) {
-		ctx->logger->debug("Rendering graph [{}] cancelled: renderer is not enabled in the context", package_url);
+auto Graph::render(bool grab_results) -> void {
+	if (!renderer) {
+		ctx->log_debug("Rendering graph [{}] cancelled: renderer is not enabled in the context", package_url);
 		return;
 	}
 
-	ctx->logger->debug("Rendering graph [{}]", package_url);
-	ctx->renderer->push(*instance);
-	ctx->renderer->run();
-	ctx->logger->debug("Done rendering");
+	ctx->log_debug("Rendering graph [{}]", package_url);
+	renderer->push(*instance);
+	renderer->run();
+	ctx->log_debug("Done rendering");
 
-	if (grab_results) {
+	if (grab_results)
 		rn::for_each(outputs_map | vi::values, &Output::grab_result);
-	}
 }
 
-auto Graph::set_resolution(OutputSize resolution_x, OutputSize resolution_y) -> void
-{
-	if (!has_parm(size_parm_name) || resolution_x == OutputSize::NONE || resolution_y == OutputSize::NONE) return;
-	auto& size_parm = parm(size_parm_name);
+auto Graph::set_resolution(OutputSize resolution_x, OutputSize resolution_y) -> void {
+	if (resolution_x == OutputSize::NONE || resolution_y == OutputSize::NONE) return;
+	auto size_parm = parm(size_parm_name);
 
-	size_parm.set(sbs::Vec2Int(
+	if (!size_parm) {
+		ctx->log_warn("Can't find size parameter for graph: []", package_url);
+		return;
+	}
+
+	size_parm->set(sbs::Vec2Int(
 	  static_cast<int>(resolution_x),
 	  static_cast<int>(resolution_y)
 	));

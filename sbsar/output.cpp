@@ -5,6 +5,7 @@ namespace sbsar {
 auto Output::grab_result() -> void
 {
 	if (!instance) return;
+	instance->flagAsDirty();
 	render_result = std::make_unique<Image>(instance);
 }
 

@@ -17,7 +17,10 @@ struct ParameterChoice {
 	int value{};
 };
 
-using LogCallback = auto (*)(const char* message, uint32_t size) -> void;
+enum class ApiCallResult : uint32_t {
+	Success = 0,
+	Failure
+};
 
 extern "C" {
 

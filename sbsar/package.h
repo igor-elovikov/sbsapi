@@ -18,22 +18,24 @@ class Package {
 	std::vector<Graph> custom_instances;
 
 public:
-
 	sbs::GraphInstances instances;
 
 	Package() = default;
+	Package(const Package&) = delete;
+	Package(Package&&) = default;
 	~Package();
-
-	explicit Package(const std::string& path, Context* context, bool instantiate)
-	{
-		ctx = context;
-		load_from_file(path, instantiate);
-	}
 
 	std::unique_ptr<sbs::PackageDesc> descriptor;
 
-	auto load_from_file(const std::string& path, bool instantiate = true) -> void;
-	[[nodiscard]] auto& graph(const std::string& id) { return graphs_map.at(id); }
+	[[nodiscard]] auto graph(const std::string& id) -> Graph* {
+		if (auto graph = graphs_map.find(id); graph != graphs_map.end()) {
+			return &graph->second;
+		}
+		else {
+			return nullptr;
+		}
+	}
+
 	[[nodiscard]] auto& graphs() { return graphs_container; }
 };
 

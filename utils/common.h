@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <unordered_map>
 #include <fstream>
@@ -15,33 +16,79 @@
 #include <range/v3/all.hpp>
 
 #include "sbsar/types.h"
+#include "error.h"
 
 namespace rn = ranges;
 namespace vi = rn::views;
 namespace sbs = SubstanceAir;
 
+inline auto get_env(const std::string& name) -> std::string {
+	auto size = GetEnvironmentVariable(name.c_str(), nullptr, 0);
+	if (!size) return {};
+
+	auto result = std::string(size - 1, 0);
+	GetEnvironmentVariable(name.c_str(), result.data(), size);
+
+	return result;
+}
+
+inline auto add_to_env(const std::string& name, const std::string& value) {
+	auto env_value = get_env(name);
+	spdlog::debug("PATH: {}", env_value);
+	auto new_value = env_value + value;
+	spdlog::debug("new value: {}", new_value);
+	SetEnvironmentVariable(name.c_str(), new_value.c_str());
+}
+
+namespace sbsar {
+
+struct error {
+	std::string message;
+
+	error() = default;
+
+	explicit error(std::string  error_message)
+	  : message(std::move(error_message)) { }
+
+	auto& set_message(const std::string& error_message) {
+		message = error_message;
+		return *this;
+	}
+
+	auto& add_message(const std::string& error_message) {
+		message += ("\n" + error_message);
+		return *this;
+	}
+};
+
+template <typename R>
+using result = ::result<R, error>;
+
 template <class Container>
-auto load_file(Container& container, const std::string& path, bool binary, spdlog::logger* logger = nullptr)
-{
-	std::ifstream is(
-	  path.c_str(),
+inline auto load_file(const std::string& path, bool binary) -> result<Container> {
+	auto container = Container();
+	auto is = std::ifstream(path.c_str(),
 	  std::ios::in | (binary ? std::ios::binary : (std::ios::openmode)0));
+
 	if (!is.is_open()) {
 		auto msg = fmt::format("file [{}] not found!", path);
-		if (logger) logger->error(msg);
-		throw std::runtime_error(msg);
+		return error(msg);
 	}
+
 	is.seekg(0, std::ios::end);
 	container.resize(is.tellg());
 	is.seekg(0, std::ios::beg);
 	is.read((char*)&container[0], container.size());
+
+	return container;
 }
+
+} // sbsar
 
 template <>
 struct fmt::formatter<sbs::Vec2Float> : fmt::formatter<std::string> {
 	template <typename FormatContext>
-	auto format(sbs::Vec2Float v, FormatContext& ctx)
-	{
+	auto format(sbs::Vec2Float v, FormatContext& ctx) {
 		return fmt::format_to(ctx.out(), "Vec2Float [{}, {}]", v.x, v.y);
 	}
 };
@@ -49,8 +96,7 @@ struct fmt::formatter<sbs::Vec2Float> : fmt::formatter<std::string> {
 template <>
 struct fmt::formatter<sbs::Vec3Float> : fmt::formatter<std::string> {
 	template <typename FormatContext>
-	auto format(sbs::Vec3Float v, FormatContext& ctx)
-	{
+	auto format(sbs::Vec3Float v, FormatContext& ctx) {
 		return fmt::format_to(ctx.out(), "Vec3Float [{}, {}, {}]", v.x, v.y, v.z);
 	}
 };
@@ -58,8 +104,7 @@ struct fmt::formatter<sbs::Vec3Float> : fmt::formatter<std::string> {
 template <>
 struct fmt::formatter<sbs::Vec4Float> : fmt::formatter<std::string> {
 	template <typename FormatContext>
-	auto format(sbs::Vec4Float v, FormatContext& ctx)
-	{
+	auto format(sbs::Vec4Float v, FormatContext& ctx) {
 		return fmt::format_to(ctx.out(), "Vec4Float [{}, {}, {}, {}]", v.x, v.y, v.z, v.w);
 	}
 };
@@ -67,8 +112,7 @@ struct fmt::formatter<sbs::Vec4Float> : fmt::formatter<std::string> {
 template <>
 struct fmt::formatter<sbs::Vec2Int> : fmt::formatter<std::string> {
 	template <typename FormatContext>
-	auto format(sbs::Vec2Int v, FormatContext& ctx)
-	{
+	auto format(sbs::Vec2Int v, FormatContext& ctx) {
 		return fmt::format_to(ctx.out(), "Vec2Int [{}, {}]", v.x, v.y);
 	}
 };
@@ -76,8 +120,7 @@ struct fmt::formatter<sbs::Vec2Int> : fmt::formatter<std::string> {
 template <>
 struct fmt::formatter<sbs::Vec3Int> : fmt::formatter<std::string> {
 	template <typename FormatContext>
-	auto format(sbs::Vec3Int v, FormatContext& ctx)
-	{
+	auto format(sbs::Vec3Int v, FormatContext& ctx) {
 		return fmt::format_to(ctx.out(), "Vec3Int [{}, {}, {}]", v.x, v.y, v.z);
 	}
 };
@@ -85,8 +128,7 @@ struct fmt::formatter<sbs::Vec3Int> : fmt::formatter<std::string> {
 template <>
 struct fmt::formatter<sbs::Vec4Int> : fmt::formatter<std::string> {
 	template <typename FormatContext>
-	auto format(sbs::Vec4Int v, FormatContext& ctx)
-	{
+	auto format(sbs::Vec4Int v, FormatContext& ctx) {
 		return fmt::format_to(ctx.out(), "Vec4Int [{}, {}, {}, {}]", v.x, v.y, v.z, v.w);
 	}
 };
@@ -94,8 +136,7 @@ struct fmt::formatter<sbs::Vec4Int> : fmt::formatter<std::string> {
 template <>
 struct fmt::formatter<sbsar::Precision> : fmt::formatter<std::string> {
 	template <typename FormatContext>
-	auto format(sbsar::Precision v, FormatContext& ctx)
-	{
+	auto format(sbsar::Precision v, FormatContext& ctx) {
 		switch (v) {
 			case sbsar::Precision::B8:
 				return fmt::format_to(ctx.out(), "8 Bits");

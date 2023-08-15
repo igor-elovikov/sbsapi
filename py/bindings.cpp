@@ -1,14 +1,12 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include "sbsar/context.h"
-#include "sbsar/package.h"
 
 namespace py = pybind11;
 
 using namespace py::literals;
 
-PYBIND11_MODULE(pysbsar, m)
-{
+PYBIND11_MODULE(pysbsar, m) {
 	spdlog::set_level(spdlog::level::debug);
 
 	py::enum_<sbsar::ParameterType>(m, "ParameterType")
@@ -72,7 +70,6 @@ PYBIND11_MODULE(pysbsar, m)
 	  .def_readwrite("width", &sbsar::OutputResolution::width)
 	  .def_readwrite("height", &sbsar::OutputResolution::height);
 
-
 	py::class_<sbsar::PixelFormat>(m, "PixelFormat")
 	  .def_readwrite("depth", &sbsar::PixelFormat::precision)
 	  .def_readwrite("format", &sbsar::PixelFormat::format)
@@ -133,23 +130,18 @@ PYBIND11_MODULE(pysbsar, m)
 	  .def_property_readonly("user_tag", &sbsar::Parameter::user_tag)
 	  .def_property_readonly("component_labels", &sbsar::Parameter::component_labels)
 	  .def_property_readonly("is_visible", &sbsar::Parameter::is_visible)
-	  .def_property_readonly("visible_condition", &sbsar::Parameter::visible_condition)
 	  .def_property_readonly("slider_step", &sbsar::Parameter::slider_step)
 	  .def_property_readonly("slider_clamp", &sbsar::Parameter::slider_clamp)
 	  .def_property_readonly("label_true", &sbsar::Parameter::label_true)
 	  .def_property_readonly("label_false", &sbsar::Parameter::label_false)
-	  .def_property("value", &sbsar::Parameter::get, &sbsar::Parameter::set<sbsar::Value>)
+	  .def_property("value", &sbsar::Parameter::get, [](sbsar::Parameter& parm, const sbsar::Value& v) {
+		  parm.set(v);
+	  })
 	  .def_property_readonly("default_value", &sbsar::Parameter::default_value)
 	  .def_property_readonly("max_value", &sbsar::Parameter::max_value)
 	  .def_property_readonly("min_value", &sbsar::Parameter::min_value)
 	  .def_property_readonly("choices", &sbsar::Parameter::choices)
-	  .def("set", &sbsar::Parameter::set<std::string>, "value"_a);
-
-	hana::for_each(sbsar::meta::sbs_parm_types, [&](auto& t) {
-		[[maybe_unused]] auto builtin_type = sbsar::meta::get_builtin_type(t);
-		using builtin_t = typename decltype(builtin_type)::type;
-		parm_class.def("set", &sbsar::Parameter::set<builtin_t>, "value"_a);
-	});
+	  .def("set", [](sbsar::Parameter& parm, const sbsar::Value& v) { parm.set(v); }, "value"_a);
 
 	py::class_<sbsar::Output>(m, "Output", py::buffer_protocol())
 	  .def("save", &sbsar::Output::save, "filename"_a)
@@ -282,7 +274,10 @@ PYBIND11_MODULE(pysbsar, m)
 	py::class_<sbsar::Context>(m, "Context")
 	  .def(py::init<bool>(), "enable_renderer"_a = true)
 	  .def(py::init<size_t>(), "memory_budget_mbytes"_a)
-	  .def("load_package", &sbsar::Context::load_package, "filename"_a, "instantiate"_a = true,
+	  .def("load_package", [](sbsar::Context& ctx, const char* filename, bool instantiate) -> sbsar::Package* {
+		  return ctx.load_package(filename, instantiate).expect();
+		  },
+		"filename"_a, "instantiate"_a = true,
 		py::return_value_policy::reference);
 
 }

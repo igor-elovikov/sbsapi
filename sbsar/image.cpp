@@ -5,8 +5,7 @@ namespace oiio = OIIO;
 
 namespace sbsar {
 
-auto get_oiio_type(const Image& image) -> oiio::TypeDesc
-{
+auto get_oiio_type(const Image& image) -> oiio::TypeDesc {
 	switch (image.format.precision) {
 
 		case Precision::B8:
@@ -37,8 +36,7 @@ auto get_oiio_type(const Image& image) -> oiio::TypeDesc
 	}
 }
 
-auto get_format_from_oiio(const oiio::TypeDesc& type_desc) -> PixelFormat
-{
+auto get_format_from_oiio(const oiio::TypeDesc& type_desc) -> PixelFormat {
 	auto format = PixelFormat{};
 	switch (type_desc.basetype) {
 		case oiio::TypeDesc::UCHAR:
@@ -69,13 +67,22 @@ auto get_format_from_oiio(const oiio::TypeDesc& type_desc) -> PixelFormat
 }
 
 Image::Image(sbs::OutputInstance* output_instance)
-  : format()
-{
+  : format() {
 	render_result = output_instance->grabResult();
-	if (!render_result || !render_result->isImage()) return;
+
+	if (!render_result) {
+		spdlog::warn("Can't grab results from output [{}]", output_instance->mDesc.mIdentifier);
+		return;
+	}
+
+	if (!render_result->isImage()) {
+		spdlog::warn("Output [{}] is not an image and it can't be saved as one", output_instance->mDesc.mIdentifier);
+		return;
+	}
 
 	rendered_image = dynamic_cast<sbs::RenderResultImage*>(render_result.get());
 	if (!rendered_image) {
+		spdlog::warn("Output [{}] couldn't get result image pointer", output_instance->mDesc.mIdentifier);
 		return;
 	}
 
@@ -92,8 +99,7 @@ Image::Image(sbs::OutputInstance* output_instance)
 	  output_instance->mDesc.mIdentifier, width, height, texture.pixelFormat);
 }
 
-auto Image::save(const std::string& filename) const -> void
-{
+auto Image::save(const std::string& filename) const -> void {
 	auto oiio_type = get_oiio_type(*this);
 
 	auto image_specs = oiio::ImageSpec(width, height, format.num_channels, oiio_type);
@@ -106,8 +112,7 @@ auto Image::save(const std::string& filename) const -> void
 	spdlog::debug("Save image to: {}", filename);
 }
 
-auto Image::load(const std::string& filename) -> void
-{
+auto Image::load(const std::string& filename) -> void {
 	auto input = oiio::ImageInput::open(filename);
 	if (!input) return;
 

@@ -77,8 +77,7 @@ struct PixelFormat {
 	int num_channels;
 
 	PixelFormat() = default;
-	explicit PixelFormat(SubstancePixelFormat pixel_format)
-	{
+	explicit PixelFormat(SubstancePixelFormat pixel_format) {
 		int sbs_precision = pixel_format & Substance_PF_MASK_RAWPrecision;
 		int channels = pixel_format & Substance_PF_MASK_RAWChannels;
 
@@ -134,8 +133,7 @@ struct PixelFormat {
 		if (format == DataFormat::RGB) num_channels = 3;
 	}
 
-	[[nodiscard]] auto as_sbs_pixelformat() const -> SubstancePixelFormat
-	{
+	[[nodiscard]] auto as_sbs_pixelformat() const -> SubstancePixelFormat {
 		auto result = 0u;
 		switch (dtype) {
 			case DataType::INTEGER:

@@ -1,0 +1,10 @@
+{
+  "name": "sbsar",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "utfcpp",
+    "openimageio",
+    "spdlog",
+    "range-v3"
+  ]
+}

@@ -3,17 +3,17 @@
 
 const auto sbsar_path = "C:/Users/elovikov/OneDrive/sbs/Unity/ring.sbsar";
 
-int main()
-{
-	spdlog::set_level(spdlog::level::debug);
+int main() {
+	add_to_env("PATH",
+	  R"(;C:\Program Files\Adobe\Adobe Substance 3D Designer;C:\Program Files\Adobe\Adobe Substance 3D Designer\plugins\engines)");
 
 	auto ctx = sbsar::Context();
 
-	auto& pkg = ctx.load_package(sbsar_path);
-	auto& graph = pkg.graph("ring");
-	auto& parm = graph.parm("Radius");
-	spdlog::info("max value: {}", parm.max_value_as<float>());
-	parm.set(10);
+	auto pkg = ctx.load_package(sbsar_path);
+
+	pkg->graph("ring")->render();
+	auto graph = pkg->graph("ring");
+	graph->output("output")->save("D:/out.png");
 
 	return 0;
 

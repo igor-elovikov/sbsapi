@@ -16,8 +16,7 @@ class Output {
 
 	std::unique_ptr<Image> render_result;
 
-	auto set_format_from_descriptor()
-	{
+	auto set_format_from_descriptor() {
 		format = PixelFormat((SubstancePixelFormat)sbs_descriptor->mFormat);
 	}
 
@@ -28,7 +27,7 @@ public:
 	PixelFormat format{};
 
 	Output() = delete;
-	Output(Output&) = delete;
+	Output(const Output&) = delete;
 	Output(Output&&) = default;
 	explicit Output(const sbs::OutputDesc* desc) { sbs_descriptor = desc; }
 
@@ -44,20 +43,17 @@ public:
 	auto override_format(const OutputResolution& resolution) -> void;
 	auto override_format(const PixelFormat& pixel_format) -> void;
 
-	[[nodiscard]] auto get_raw_data() const -> void*
-	{
+	[[nodiscard]] auto get_raw_data() const -> void* {
 		if (!render_result) return nullptr;
 		return render_result->get_raw_data();
 	}
 
-	[[nodiscard]] const auto& get_data_format() const
-	{
+	[[nodiscard]] const auto& get_data_format() const {
 		if (!render_result) return format;
 		return render_result->format;
 	}
 
-	[[nodiscard]] auto get_data_size() const
-	{
+	[[nodiscard]] auto get_data_size() const {
 		if (!render_result) return std::make_pair(0, 0);
 		return std::make_pair(render_result->width, render_result->height);
 	}

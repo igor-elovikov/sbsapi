@@ -15,7 +15,7 @@ class Input {
 
 public:
 	Input() = delete;
-	Input(Input&) = delete;
+	Input(const Input&) = delete;
 	Input(Input&&) = default;
 	explicit Input(const sbs::InputDescImage* desc) { sbs_descriptor = desc; }
 
@@ -28,16 +28,13 @@ public:
 	[[nodiscard]] auto is_color() const { return sbs_descriptor->mIsColor; }
 	[[nodiscard]] auto is_floating_point() const { return sbs_descriptor->mIsFPFormat; }
 	[[nodiscard]] auto usages() const { return sbs_descriptor->mChannelsStr | rn::to<std::vector<std::string>>; }
-	[[nodiscard]] auto is_visible() const
-	{
+	[[nodiscard]] auto is_visible() const {
 		if (instance) return sbs::VisibleIf::EvalVisibleIf(instance);
 		return true;
 	}
-	[[nodiscard]] auto default_usage() const
-	{
+	[[nodiscard]] auto default_usage() const {
 		return static_cast<std::string>(sbs_descriptor->defaultChannelUseStr());
 	}
-
 
 	auto load_from_file(const std::string& filename) -> void;
 	auto load_from_buffer(void* data, int width, int height, PixelFormat format) -> void;

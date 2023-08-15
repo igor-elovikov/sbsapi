@@ -12,6 +12,7 @@ class Context;
 class Graph {
 
 	Context* ctx = nullptr;
+	sbs::Renderer* renderer = nullptr;
 
 	std::vector<Parameter> parms_container;
 	std::unordered_map<std::string, Parameter&> parms_map;
@@ -30,19 +31,19 @@ class Graph {
 	auto load_inputs() -> void;
 	auto link_instance() -> void;
 
-	std::string package_url;
+
 
 public:
+	std::string package_url;
 	friend class Package;
+	friend class Context;
 
 	static constexpr auto size_parm_name = "$outputsize";
 	static constexpr auto randomseed_parm_name = "$randomseed";
 	[[nodiscard]] auto descriptor() const { return sbs_descriptor; }
 
-
-
-	Graph() = delete;
-	Graph(Graph&) = delete;
+	Graph() = default;
+	Graph(const Graph&) = delete;
 	Graph(Graph&&) = default;
 	explicit Graph(const sbs::GraphDesc& graph_descriptor) { sbs_descriptor = &graph_descriptor; }
 
@@ -55,18 +56,45 @@ public:
 	[[nodiscard]] auto author_url() const { return std::string(sbs_descriptor->mAuthorUrl); }
 	[[nodiscard]] auto user_tag() const { return std::string(sbs_descriptor->mUserTag); }
 	[[nodiscard]] auto type() const { return std::string(sbs_descriptor->mTypeStr); }
-	[[nodiscard]] auto has_parm(const std::string& parm_id) const -> bool { return parms_map.contains(parm_id); }
-	[[nodiscard]] auto& parm(const std::string& parm_id) { return parms_map.at(parm_id); }
-	[[nodiscard]] auto has_output(const std::string& output_id) const -> bool
-	{
-		return outputs_map.contains(output_id);
-	}
-	[[nodiscard]] auto& output(const std::string& output_id) { return outputs_map.at(output_id); }
-	[[nodiscard]] auto has_input(const std::string& output_id) const -> bool { return inputs_map.contains(output_id); }
-	[[nodiscard]] auto& input(const std::string& output_id) { return inputs_map.at(output_id); }
+
 	[[nodiscard]] auto& parms() { return parms_container; }
 	[[nodiscard]] auto& outputs() { return outputs_container; }
 	[[nodiscard]] auto& inputs() { return inputs_container; }
+
+	[[nodiscard]] auto has_parm(const std::string& parm_id) const -> bool {
+		return parms_map.find(parm_id) != parms_map.end();
+	}
+
+	[[nodiscard]] auto parm(const std::string& parm_id) -> Parameter* {
+		if (auto parm = parms_map.find(parm_id); parm != parms_map.end()) {
+			return &parm->second;
+		}
+		else {
+			return nullptr;
+		}
+	}
+
+	[[nodiscard]] auto has_output(const std::string& output_id) const -> bool {
+		return outputs_map.find(output_id) != outputs_map.end();
+	}
+
+	[[nodiscard]] auto output(const std::string& output_id) -> Output* {
+		if (auto output = outputs_map.find(output_id); output != outputs_map.end()) {
+			return &output->second;
+		}
+		return nullptr;
+	}
+
+	[[nodiscard]] auto has_input(const std::string& output_id) const -> bool {
+		return inputs_map.find(output_id) != inputs_map.end();
+	}
+
+	[[nodiscard]] auto input(const std::string& input_id) -> Input* {
+		if (auto input = inputs_map.find(input_id); input != inputs_map.end()) {
+			return &input->second;
+		}
+		return nullptr;
+	}
 
 	auto render(bool grab_results = true) -> void;
 	auto set_resolution(OutputSize resolution) -> void { set_resolution(resolution, resolution); }
