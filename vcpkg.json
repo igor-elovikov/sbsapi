@@ -1,0 +1,9 @@
+{
+  "name" : "sbsapi",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "5fb67e9da9fd3d81fd30e6d7e66b067580d0f7fb",
+  "dependencies" : [ {
+    "name" : "spdlog",
+    "version>=" : "1.13.0"
+  } ]
+}
