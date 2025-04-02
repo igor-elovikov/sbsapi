@@ -5,40 +5,19 @@
 #pragma once
 
 #include <string>
-#include <utility>
-#include <vector>
-#include <unordered_map>
 #include <fstream>
 
 #include <substance/framework/framework.h>
 
 #include <spdlog/spdlog.h>
-#include <range/v3/all.hpp>
+#include <ranges>
 
-#include "sbsar/types.h"
+#include "../sbsar/types.h"
 #include "error.h"
 
-namespace rn = ranges;
-namespace vi = rn::views;
+namespace rn = std::ranges;
+namespace vi = std::ranges::views;
 namespace sbs = SubstanceAir;
-
-inline auto get_env(const std::string& name) -> std::string {
-	auto size = GetEnvironmentVariable(name.c_str(), nullptr, 0);
-	if (!size) return {};
-
-	auto result = std::string(size - 1, 0);
-	GetEnvironmentVariable(name.c_str(), result.data(), size);
-
-	return result;
-}
-
-inline auto add_to_env(const std::string& name, const std::string& value) {
-	auto env_value = get_env(name);
-	spdlog::debug("PATH: {}", env_value);
-	auto new_value = env_value + value;
-	spdlog::debug("new value: {}", new_value);
-	SetEnvironmentVariable(name.c_str(), new_value.c_str());
-}
 
 namespace sbsar {
 

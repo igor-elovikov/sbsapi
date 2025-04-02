@@ -1,4 +1,4 @@
-#include "common.h"
+#include "../utils/common.h"
 #include "input.h"
 #include "image.h"
 

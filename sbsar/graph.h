@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "../utils/common.h"
 #include "parameter.h"
 #include "output.h"
 #include "input.h"
@@ -30,8 +30,6 @@ class Graph {
 	auto load_outputs() -> void;
 	auto load_inputs() -> void;
 	auto link_instance() -> void;
-
-
 
 public:
 	std::string package_url;

@@ -1,11 +1,19 @@
 #include "utils/common.h"
 #include "sbsar/context.h"
 
+
 const auto sbsar_path = "C:/Users/elovikov/OneDrive/sbs/Unity/ring.sbsar";
 
+struct S {
+	int a;
+};
+
+
+
 int main() {
-	add_to_env("PATH",
-	  R"(;C:\Program Files\Adobe\Adobe Substance 3D Designer;C:\Program Files\Adobe\Adobe Substance 3D Designer\plugins\engines)");
+
+	auto s = std::optional<S*>{};
+
 
 	auto ctx = sbsar::Context();
 
@@ -14,6 +22,12 @@ int main() {
 	pkg->graph("ring")->render();
 	auto graph = pkg->graph("ring");
 	graph->output("output")->save("D:/out.png");
+
+	if (const auto g = pkg->graph("ring"); g != nullptr) {
+
+	}
+
+	graph->parm("test")->set(10);
 
 	return 0;
 

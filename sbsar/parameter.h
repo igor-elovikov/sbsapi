@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "../utils/common.h"
 #include "metatypes.h"
 #include <substance/framework/visibleif.h>
 #include <optional>
@@ -82,7 +82,7 @@ public:
 	[[nodiscard]] auto id() const { return static_cast<std::string>(sbs_descriptor->mIdentifier); }
 	[[nodiscard]] auto label() const { return static_cast<std::string>(sbs_descriptor->mLabel); }
 	[[nodiscard]] auto group() const { return static_cast<std::string>(sbs_descriptor->mGuiGroup); }
-	[[nodiscard]] auto usages() const { return sbs_descriptor->mChannelsStr | rn::to<std::vector<std::string>>; }
+	[[nodiscard]] auto usages() const { return 0 /*sbs_descriptor->mChannelsStr | rn::to<std::vector<std::string>>*/; }
 	[[nodiscard]] auto description() const { return static_cast<std::string>(sbs_descriptor->mGuiDescription); }
 	[[nodiscard]] auto visible_condition() const { return static_cast<std::string>(sbs_descriptor->mGuiVisibleIf); }
 	[[nodiscard]] auto widget() const { return static_cast<ParameterWidget>(sbs_descriptor->mGuiWidget); }
@@ -126,7 +126,7 @@ public:
 
 	[[nodiscard]] auto component_labels() const {
 		if (auto descriptor = numerical_desc())
-			return descriptor->mGuiVecLabels | rn::to<std::vector<std::string>>;
+			return std::vector<std::string>{};
 		else
 			return std::vector{label()};
 	}

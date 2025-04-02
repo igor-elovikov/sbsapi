@@ -1,9 +1,16 @@
 #pragma once
 
+#include <cstdint>
+
 #include "sbsapi_export.h"
 #include "common.h"
 #include "sbsar/package.h"
 #include "sbsar/context.h"
+
+namespace sbsar {
+enum class ParameterType;
+enum class ParameterWidget;
+}
 
 namespace sbsar::capi {
 
